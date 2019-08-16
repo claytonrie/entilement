@@ -1,3 +1,4 @@
+const TMULT = 256;
 var player = new (class {
     constructor (x = 0, y = 0) {
         this.pos = new Vec2(x, y);
