@@ -100,13 +100,13 @@ class Tile {
         tiles.type.push(type);
         // Position divided by 16
         if (divide) {
-            if ((x / 16) | 0 > tiles.maxX || (y / 16) | 0 > tile.maxY) {
+            if ((x / 16) | 0 > tiles.maxX || (y / 16) | 0 > tiles.maxY) {
                 throw new Error(`Tile out of bounds at position (${(x / 16) | 0}, ${(y / 16) | 0})`);
             }
             tiles.x.push((x / 16) | 0);
             tiles.y.push((y / 16) | 0);
         } else {
-            if ((x | 0) > tiles.maxX || (y | 0) > tile.maxY) {
+            if ((x | 0) > tiles.maxX || (y | 0) > tiles.maxY) {
                 throw new Error(`Tile out of bounds at position (${x | 0}, ${y | 0})`);
             }
             tiles.x.push(x | 0);
