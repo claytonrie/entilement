@@ -120,25 +120,19 @@ class Tile {
         let dx = x - (x % 16),
             dy = y - (y % 16);
         if (Tile.innerColorTable[type] !== null) {
-            ctx.fillStyle = Tile.innerColorTable[type];
-            ctx.globalAlpha = 0.75;
-            ctx.fillRect(dx, dy, 16, 16);
-            ctx.globalAlpha = 1;
+            Drawer.color = Tile.innerColorTable[type];
+            Drawer.drawRect(false, dx, dy, 16, 16, 0.75);
         }
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = Tile.outerColorTable[type];
-        ctx.strokeRect(dx + 1.5, dy + 1.5, 13, 13);
+        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[type]);
+        Drawer.drawRect(true, dx, dy, 16, 16);
     }
 
-    static action(type, dir) {
+    static onStep(type, dir) {
         let posx = player.tar.x,
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
         console.log(type, dir);
-        if (type < 0) {
-            //player.die();
-            return;
-        }
+        // Nothing for type < 0 (no Tile)
         if (type === 0) { // Blue tile
             tiles.setTile(-1, posx, posy);
             new TileAnimation(0, posx, posy);
@@ -160,14 +154,7 @@ class Tile {
             player.resetTransition();
             return;
         }
-        if (type === 3) { // Purple tile (ends level)
-            if (tiles.checkEnding()) {
-                level.next();
-            } else {
-                player.die();
-            }
-            return;
-        }
+        // Nothing for type 3 (Purple tile)
         if (type === 4) { // Orange Tile
             tiles.setTile(0, posx, posy); // Change to Blue tile
             new TileAnimation(4, posx, posy);
@@ -224,6 +211,21 @@ class Tile {
                 player.tar.y = tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0);
             }
             player.resetTransition();
+            return;
+        }
+        throw new Error("Invalid Tile Type");
+    }
+    
+    static onLand(type, dir) {
+        if (type < 0) {
+            player.die();
+        }
+        if (type === 3) { // Purple tile (ends level)
+            if (tiles.checkEnding()) {
+                level.next();
+            } else {
+                player.die();
+            }
             return;
         }
     }
