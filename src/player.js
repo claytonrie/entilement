@@ -67,30 +67,19 @@ var player = new (class {
     }
 
     die () {
+        // TODO: Add animation
         level.load(level.current);
     }
 
     draw () {
-        ctx.beginPath();
-        ctx.moveTo(this.pos.x + 5, this.pos.y);
-        ctx.arc(this.pos.x, this.pos.y, 5, 0, 6.28318531);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "yellow";
-        ctx.fillStyle = "#FFF";
-        ctx.globalAlpha = 0.25;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.stroke();
+        Drawer.color = "#FFF";
+        Drawer.drawCirc(false, this.pos, 7, 0.333);
+        Drawer.setLineWidth(3).setColor("yellow")
+        Drawer.drawCirc(true, this.pos, 7);
 
         if (!this.atTarget) {
-            ctx.beginPath();
-            ctx.moveTo(this.tar.x + 6, this.tar.y);
-            ctx.arc(this.tar.x, this.tar.y, 6, 0, 6.28318531);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "#FFF";
-            ctx.globalAlpha = 0.5;
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+            Drawer.setLineWidth(1).setColor("#FFF");
+            Drawer.drawCirc(true, this.pos, 7, 0.5);
         }
     }
 })(8, 8);
