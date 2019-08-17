@@ -2,9 +2,9 @@ const TMULT = 256;
 var player = new (class {
     constructor (x = 0, y = 0) {
         this.pos = new Vec2(x, y);
-        this.tar = new Vec2(x + 64, y + 32);
-        this.vel = new Vec2(2 * Math.random() - 1, 0);
-        this.acc = new Vec2(0, 0);
+        this.tar = new Vec2(x, y);
+        this.vel = new Vec2();
+        this.acc = new Vec2();
         this.slopeVar = new Vec2(null, null);
         this.slopeCounter = new Vec2(null, null);
         this.atTarget = false;
@@ -25,7 +25,7 @@ var player = new (class {
     }
 
     smoothTransition (dt) {
-        if (Vec2.sqDist(this.pos, this.tar) < 1) {
+        if (Vec2.sqDist(this.pos, this.tar) < 1 / Drawer.scale) {
             this.vel.x = this.vel.y = 0;
             this.acc.x = this.acc.y = 0;
             this.pos.x = this.tar.x;

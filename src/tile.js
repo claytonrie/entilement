@@ -90,6 +90,12 @@ var tiles = new (class {
         for (; i >= 0; i -= 1) {
             Tile.draw(this.type[i], this.x[i] * 16, this.y[i] * 16);
         }
+        i = this.alength - 1;
+        if (i >= 0) {
+            for (; i >= 0; i -= 1) {
+                TileAnimation.advanceDraw(dt, i);
+            }
+        }
     }
 })();
 tiles.maxX = 60;
