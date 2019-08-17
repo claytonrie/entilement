@@ -72,14 +72,14 @@ var player = new (class {
     }
 
     draw () {
+        if (!this.atTarget) {
+            Drawer.setLineWidth(1).setColor("#FFF");
+            Drawer.drawCirc(true, this.tar, 7, 0.5);
+        }
+        
         Drawer.color = "#FFF";
         Drawer.drawCirc(false, this.pos, 7, 0.333);
         Drawer.setLineWidth(3).setColor("yellow")
         Drawer.drawCirc(true, this.pos, 7);
-
-        if (!this.atTarget) {
-            Drawer.setLineWidth(1).setColor("#FFF");
-            Drawer.drawCirc(true, this.pos, 7, 0.5);
-        }
     }
 })(8, 8);
