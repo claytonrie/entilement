@@ -36,20 +36,62 @@ class TileAnimation {
         return true;
     }
 
-    static shrink(dt, ind, color) {
+    static shrink (dt, ind, color)  {
         let shrink = tiles.atime[ind] / 64;
-        Drawer.lineWidth = 3 / shrink;
-        shrink += 1.5 / shrink;
-        if (shrink >= 8) {
-            return true;
-        }
-        Drawer.color = color;
+        if (shrink >= 8) { return true; }
+        Drawer.setLineWidth(3 / shrink).setColor(color);
+        Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
+            16 - 2 * shrink, 16 - 2 * shrink);
+        return false;
+    }
+    static shrinkFill (dt, ind, color)  {
+        let shrink = tiles.atime[ind] / 64;
+        if (shrink >= 8) { return true; }
+        Drawer.setLineWidth(3 / shrink).setColor(color);
+        Drawer.drawRect(false, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
+            16 - 2 * shrink, 16 - 2 * shrink, 0.5);
         Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
     }
     
-    static animate0(dt, ind) { return TileAnimation.shrink(dt, ind, "blue"); }
-    static animate1(dt, ind) { return TileAnimation.shrink(dt, ind, "red"); }
-    static animate2(dt, ind) { return TileAnimation.shrink(dt, ind, "green"); }
+    static animate0 (dt, ind) { return TileAnimation.shrink(dt, ind, "blue"); }
+    static animate1 (dt, ind) { return TileAnimation.shrink(dt, ind, "red"); }
+    static animate2 (dt, ind) { return TileAnimation.shrink(dt, ind, "green"); }
+	static animate4 (dt, ind) {
+        let op = 1 - (tiles.atime[ind] / 512);
+        Drawer.lineWidth = 3;
+        if (op <= 0) { return true; }
+        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[4]);
+        Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+        return false;
+    }
+    static animate6 (dt, ind) { return TileAnimation.shrinkFill(dt, ind, "blue"); }
+    static animate7 (dt, ind) { return TileAnimation.shrinkFill(dt, ind, "red"); }
+    static animate8 (dt, ind) {
+        let op = 1 - (tiles.atime[ind] / 512);
+        if (op <= 0) { return true; }
+        Drawer.color = Tile.innerColorTable[8];
+        Drawer.drawRect(false, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75 * op);
+        return false;
+    }
+    static animate9 (dt, ind) {
+        let op = 1 - (tiles.atime[ind] / 512);
+        if (op <= 0) { return true; }
+        Drawer.setLineWidth(5 * op + 3).setColor(Tile.innerColorTable[9]);
+        Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
+        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[9]);
+        Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+        return false;
+    }
+    static animate10 (dt, ind) {
+        let op = 1 - (tiles.atime[ind] / 512);
+        if (op <= 0) { return true; }
+        Drawer.setLineWidth(5 * op + 3).setColor(Tile.innerColorTable[10]);
+        Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
+        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[10]);
+        Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+        return false;
+    }
+    static animate11 (dt, ind) { return TileAnimation.shrink(dt, ind, "#FF0"); }
 }
