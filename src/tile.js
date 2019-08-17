@@ -42,15 +42,16 @@ var tiles = new (class {
     }
 
     searchHorz(x, y, backwards = false) {
+        let bx = (x / 16) | 0, by = (y / 16) | 0;
         let i = this.length - 1;
-        let bound = backwards ? 0 : 0xFFF0, sign = backwards ? -1 : 1;
+        let bound = backwards ? 0 : tiles.maxX, sign = backwards ? -1 : 1;
         for (; i >= 0; i -= 1) {
-            if (this.y[i] === y) {
+            if (this.y[i] === by) {
                 if (sign * this.x[i] < sign * bound &&
-                        sign * this.x[i] >= sign * x) {
+                        sign * this.x[i] >= sign * bx) {
                     bound = this.x[i];
-                    if (bound === x) {
-                        return x;
+                    if (bound === bx) {
+                        return bx;
                     }
                 }
             }
@@ -58,15 +59,16 @@ var tiles = new (class {
         return bound;
     }
     searchVert(x, y, backwards = false) {
+        let bx = (x / 16) | 0, by = (y / 16) | 0;
         let i = this.length - 1;
-        let bound = backwards ? 0 : 0xFFF0, sign = backwards ? -1 : 1;
+        let bound = backwards ? 0 : tiles.maxY, sign = backwards ? -1 : 1;
         for (; i >= 0; i -= 1) {
-            if (this.x[i] === x) {
+            if (this.x[i] === bx) {
                 if (sign * this.y[i] < sign * bound &&
-                        sign * this.y[i] >= sign * y) {
+                        sign * this.y[i] >= sign * by) {
                     bound = this.y[i];
-                    if (bound === y) {
-                        return y;
+                    if (bound === by) {
+                        return by;
                     }
                 }
             }
@@ -212,9 +214,9 @@ class Tile {
             tiles.setTile(-1, posx, posy);
             new TileAnimation(11, posx, posy);
             if (dir.x !== 0) {
-                player.tar.x = tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0);
+                player.tar.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0);
             } else {
-                player.tar.y = tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0);
+                player.tar.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0);
             }
             player.resetTransition();
             return;
