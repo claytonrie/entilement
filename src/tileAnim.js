@@ -22,7 +22,7 @@ class TileAnimation {
     static init11(ind) {}
 
     static advanceDraw(dt, ind) {
-        tiles.atime += dt;
+        tiles.atime[ind] += dt;
         if (TileAnimation[`animate${tiles.atype[ind]}`](dt, ind)) {
             // Delete tile animation if done
             tiles.atype.splice(ind, 1);
