@@ -11,6 +11,7 @@ var Drawer = new (class {
 
         this.__COLOR__ = "#000";
         this.__LWIDTH__ = this.scale;
+        this.__OP__ = 1;
         return this;
     }
 
@@ -36,6 +37,17 @@ var Drawer = new (class {
     }
     setLineWidth(val) {
         this.lineWidth = val;
+        return this;
+    }
+    
+    get op() {
+        return this.__OP__;
+    }
+    set op(val) {
+        return this.__OP__ = val;
+    }
+    setOp(val) {
+        this.op = val;
         return this;
     }
 
@@ -71,7 +83,7 @@ var Drawer = new (class {
         rx *= this.scale; ry *= this.scale;
         rw *= this.scale; rh *= this.scale;
 
-        this.ctx.globalAlpha = rop;
+        this.ctx.globalAlpha = rop * this.__OP__;
         if (stroke) {
             let lnFact = this.lineWidth * this.scale / 2;
             this.ctx.strokeRect(rx + lnFact, ry + lnFact,
@@ -96,7 +108,7 @@ var Drawer = new (class {
         rr *= this.scale;
 
         this.ctx.beginPath();
-        this.ctx.globalAlpha = rop;
+        this.ctx.globalAlpha = rop * this.__OP__;
         if (stroke) {
             let lnFact = this.lineWidth * this.scale / 2;
             this.ctx.moveTo(rx + rr - lnFact, ry);
@@ -110,9 +122,18 @@ var Drawer = new (class {
     }
 
     path   () { this.ctx.beginPath(); return this; }
-    fill   () { this.ctx.fill();      return this; }
-    stroke () { this.ctx.stroke();    return this; }
-    draw (stroke) {
+    fill   (op = 1) { 
+        this.ctx.globalAlpha = op * this.__OP__;
+        this.ctx.fill();
+        return this;
+    }
+    stroke (op = 1) {
+        this.ctx.globalAlpha = op * this.__OP__;
+        this.ctx.stroke();
+        return this;
+    }
+    draw (stroke, op = 1) {
+        this.ctx.globalAlpha = op * this.__OP__;
         if (stroke) { this.stroke(); } else { this.fill(); }
     }
     moveTo (x, y) {
