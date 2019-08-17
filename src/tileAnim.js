@@ -30,6 +30,7 @@ class TileAnimation {
             tiles.ay.splice(ind, 1);
             tiles.atime.splice(ind, 1);
             tiles.amisc.splice(ind, 1);
+            tiles.alength -= 1;
             return false;
         }
         return true;
