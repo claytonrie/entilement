@@ -54,11 +54,11 @@ class TileAnimation {
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
     }
-    
+
     static animate0 (dt, ind) { return TileAnimation.shrink(dt, ind, "blue"); }
     static animate1 (dt, ind) { return TileAnimation.shrink(dt, ind, "red"); }
     static animate2 (dt, ind) { return TileAnimation.shrink(dt, ind, "green"); }
-	static animate4 (dt, ind) {
+    static animate4 (dt, ind) {
         let op = 1 - (tiles.atime[ind] / 512);
         Drawer.lineWidth = 3;
         if (op <= 0) { return true; }
