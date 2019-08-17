@@ -35,7 +35,7 @@ class TileAnimation {
         return true;
     }
 
-    static shrinkAnimation(dt, ind, color) {
+    static shrink(dt, ind, color) {
         let shrink = tiles.atime[ind] / 64;
         Drawer.lineWidth = 3 / shrink;
         shrink += 1.5 / shrink;
@@ -43,11 +43,12 @@ class TileAnimation {
             return true;
         }
         Drawer.color = color;
-        Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] = shrink,
+        Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
     }
-    static animate0(dt, ind) { return shrinkAnimation(dt, ind, "blue"); }
-    static animate1(dt, ind) { return shrinkAnimation(dt, ind, "red"); }
-    static animate2(dt, ind) { return shrinkAnimation(dt, ind, "green"); }
+    
+    static animate0(dt, ind) { return TileAnimation.shrink(dt, ind, "blue"); }
+    static animate1(dt, ind) { return TileAnimation.shrink(dt, ind, "red"); }
+    static animate2(dt, ind) { return TileAnimation.shrink(dt, ind, "green"); }
 }
