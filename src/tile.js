@@ -214,9 +214,9 @@ class Tile {
             tiles.setTile(-1, posx, posy);
             new TileAnimation(11, posx, posy);
             if (dir.x !== 0) {
-                player.tar.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0);
+                player.tar.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
             } else {
-                player.tar.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0);
+                player.tar.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0) + 8;
             }
             player.resetTransition();
             return;
@@ -239,18 +239,18 @@ class Tile {
     }
 }
 Tile.outerColorTable = [
-    "blue", "red", "green",
-    "purple",
-    "orange", "grey",
-    "blue", "red",
+	"#00E", "#E00", "#0E0",
+    "#A0A",
+    "#F80", "#AAA",
+    "#00E", "#E00",
     "#F80", "#F80", "#F80",
-    "yellow"
+    "#FF0"
 ];
 Tile.innerColorTable = [
-    null, null, null,
+	null, null, null,
     null,
     null, null,
-    "blue", "red",
-    "#F80", "red", "green",
+    "#00E", "#E00", 
+    "#F80", "#E00", "#0E0",
     null
 ];
