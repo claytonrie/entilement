@@ -50,6 +50,18 @@ var Drawer = new (class {
         this.op = val;
         return this;
     }
+    
+    get size() {
+        return this.__SIZE__;
+    }
+    set size(val) {
+        this.ctx.font = `${val * this.scale}px monospace`;
+        return this.__SIZE__ = val;
+    }
+    setSize(val) {
+        this.size = val;
+        return this;
+    }
 
     drawRect(stroke, x, y, w = 1, h = 1, op = 1, useDim = 1) {
         // This bit of code is to allow use to substitute vectors
@@ -118,6 +130,25 @@ var Drawer = new (class {
             this.ctx.moveTo(rx + rr, ry);
             this.ctx.arc(rx, ry, rr, 0, 6.28318531);
             this.ctx.fill();
+        }
+    }
+    
+    drawText(stroke, txt, x, y = 1, op = 1) {
+        let rx, ry, rop;
+        if (typeof x !== 'number') {
+            rx = x.x; ry = x.y;
+            rop = y;
+        } else {
+            rx = x; ry = y;
+            rop = op;
+        }
+        rx *= this.scale; ry *= this.scale;
+
+        this.ctx.globalAlpha = rop * this.__OP__;
+        if (stroke) {
+            this.ctx.strokeText(txt, rx, ry);
+        } else {
+            this.ctx.fillText(txt, rx, ry);
         }
     }
 
