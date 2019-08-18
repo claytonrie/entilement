@@ -67,8 +67,7 @@ var player = new (class {
     }
 
     die () {
-        // TODO: Add animation
-        level.load(level.current);
+        Game.mode = 3;
     }
 
     draw () {
