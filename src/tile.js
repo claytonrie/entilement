@@ -139,7 +139,6 @@ class Tile {
         let posx = player.tar.x,
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
-        console.log(type, dir);
         // Nothing for type < 0 (no Tile)
         if (type === 0) { // Blue tile
             tiles.setTile(-1, posx, posy);
@@ -223,7 +222,7 @@ class Tile {
         }
         throw new Error("Invalid Tile Type");
     }
-    
+
     static onLand(type, dir) {
         if (type < 0) {
             player.die();
@@ -239,7 +238,7 @@ class Tile {
     }
 }
 Tile.outerColorTable = [
-	"#00E", "#E00", "#0E0",
+    "#00E", "#E00", "#0E0",
     "#A0A",
     "#F80", "#AAA",
     "#00E", "#E00",
@@ -247,10 +246,10 @@ Tile.outerColorTable = [
     "#FF0"
 ];
 Tile.innerColorTable = [
-	null, null, null,
+    null, null, null,
     null,
     null, null,
-    "#00E", "#E00", 
+    "#00E", "#E00",
     "#F80", "#E00", "#0E0",
     null
 ];
