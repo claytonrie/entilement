@@ -7,12 +7,21 @@ var Drawer = new (class {
         document.body.appendChild(this.cv);
         this.ctx = this.cv.getContext("2d");
         SZ = this.size = size;
-        this.scale = scale;
+        this.__SC__ = scale;
 
         this.__COLOR__ = "#000";
         this.__LWIDTH__ = this.scale;
         this.__OP__ = 1;
         return this;
+    }
+    
+    get scale() {
+        return this.__SC__;
+    }
+    set scale(val) {
+        this.cv.height = this.size * val;
+        this.cv.width = this.size * val;
+        return this.__SC__ = val;
     }
 
     get color() {
@@ -55,7 +64,7 @@ var Drawer = new (class {
         return this.__SIZE__;
     }
     set size(val) {
-        this.ctx.font = `${val * this.scale}px monospace`;
+        this.ctx.font = `${(val * this.scale) | 0}px monospace`;
         return this.__SIZE__ = val;
     }
     setSize(val) {
