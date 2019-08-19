@@ -1,16 +1,15 @@
 const TMULT = 256;
-var player = new (class {
-    constructor (x = 0, y = 0) {
+class TransitObj {
+    constructor (x, y, tx, ty) {
         this.pos = new Vec2(x, y);
-        this.tar = new Vec2(x, y);
+        this.tar = new Vec2(tx, ty);
         this.vel = new Vec2();
         this.acc = new Vec2();
         this.slopeVar = new Vec2(null, null);
         this.slopeCounter = new Vec2(null, null);
         this.atTarget = false;
-        return this;
     }
-
+    
     move (dt) {
         this.pos.addEq(Vec2.scAddSc(dt / TMULT, this.vel,
             (dt * dt) / (2 * TMULT * TMULT), this.acc));
@@ -42,7 +41,7 @@ var player = new (class {
                 this.slopeVar.y = isNaN(slope) ? 0 : slope;
                 this.slopeCounter.x = 1; this.slopeCounter.y = 1;
             }
-            if (Math.abs(dist.x) < 0.5) {
+            if (Math.abs(dist.x) < 0.5 / Drawer.scale) {
                 this.acc.x = 0;
                 this.vel.x = 0;
             } else {
@@ -52,7 +51,7 @@ var player = new (class {
                     (2 * this.slopeVar.x / this.slopeCounter.x)) * basex;
                 this.acc.x = isNaN(accx) ? 0 : -accx;
             }
-            if (Math.abs(dist.y) < 0.5) {
+            if (Math.abs(dist.y) < 0.5 / Drawer.scale) {
                 this.acc.y = 0;
                 this.vel.y = 0;
             } else {
@@ -64,6 +63,12 @@ var player = new (class {
             }
             this.slopeCounter.addEq(this.slopeVar.scale(dt / TMULT));
         }
+    }
+}
+
+var player = new (class extends TransitObj {
+    constructor (x = 0, y = 0) {
+        super(x, y, x, y);
     }
 
     die () {
@@ -81,4 +86,4 @@ var player = new (class {
         Drawer.setLineWidth(3).setColor("yellow")
         Drawer.drawCirc(true, this.pos, 7);
     }
-})(8, 8);
+})(-8, -8);

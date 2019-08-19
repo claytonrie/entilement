@@ -5,21 +5,9 @@ class TileAnimation {
         tiles.atype.push(type);
         tiles.ax.push(x); tiles.ay.push(y);
         tiles.atime.push(0);
-        tiles.amisc.push(null);
-        TileAnimation[`init${tiles.atype[tiles.alength]}`](tiles.alength);
         tiles.alength += 1;
         return true;
     }
-    static  init0(ind) {}
-    static  init1(ind) {}
-    static  init2(ind) {}
-    static  init4(ind) {}
-    static  init6(ind) {}
-    static  init7(ind) {}
-    static  init8(ind) {}
-    static  init9(ind) {}
-    static init10(ind) {}
-    static init11(ind) {}
 
     static advanceDraw(dt, ind) {
         tiles.atime[ind] += dt;
@@ -29,7 +17,6 @@ class TileAnimation {
             tiles.ax.splice(ind, 1);
             tiles.ay.splice(ind, 1);
             tiles.atime.splice(ind, 1);
-            tiles.amisc.splice(ind, 1);
             tiles.alength -= 1;
             return false;
         }

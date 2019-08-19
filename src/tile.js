@@ -226,6 +226,7 @@ class Tile {
     static onLand(type, dir) {
         if (type < 0) {
             player.die();
+            return 0;
         }
         if (type === 3) { // Purple tile (ends level)
             if (tiles.checkEnding()) {
@@ -233,8 +234,9 @@ class Tile {
             } else {
                 player.die();
             }
-            return;
+            return 0;
         }
+        return [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity][type];
     }
 }
 Tile.outerColorTable = [
