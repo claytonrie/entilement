@@ -1,9 +1,9 @@
 const TMULT = 256;
 class TransitObj {
-    constructor (x, y, tx, ty) {
+    constructor (x, y, tx = x, ty = y, vx = 0, vy = 0) {
         this.pos = new Vec2(x, y);
         this.tar = new Vec2(tx, ty);
-        this.vel = new Vec2();
+        this.vel = new Vec2(vx, vy);
         this.acc = new Vec2();
         this.slopeVar = new Vec2(null, null);
         this.slopeCounter = new Vec2(null, null);
@@ -68,7 +68,7 @@ class TransitObj {
 
 var player = new (class extends TransitObj {
     constructor (x = 0, y = 0) {
-        super(x, y, x, y);
+        super(x, y);
     }
 
     die () {
