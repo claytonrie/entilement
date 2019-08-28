@@ -1,5 +1,5 @@
 // Key input set up
-var key = (class {
+var key = new (class {
     constructor () {
         this.pressed = [];
         this.buffered = [];
