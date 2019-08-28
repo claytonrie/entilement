@@ -48,16 +48,16 @@ var key = new (class {
         const cooldown = 192,
             pressTbl = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
         if (this.isBuffered("w")) {
-            this.useBuffered("w");
+            this.useBuffer("w");
             this.dirPress = "w";
         } else if (this.isBuffered("a")) {
-            this.useBuffered("a");
+            this.useBuffer("a");
             this.dirPress = "a";
         } else if (this.isBuffered("s")) {
-            this.useBuffered("s");
+            this.useBuffer("s");
             this.dirPress = "s";
         } else if (this.isBuffered("d")) {
-            this.useBuffered("d");
+            this.useBuffer("d");
             this.dirPress = "d";
         }
         if (!this.pressed.includes(this.dirPress)) {
