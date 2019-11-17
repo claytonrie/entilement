@@ -10,9 +10,7 @@ class TransitObj {
     }
     
     move (dt) {
-        this.pos.addEq(Vec2.scAddSc(dt / TMULT, this.vel,
-            (dt * dt) / (2 * TMULT * TMULT), this.acc));
-        this.vel.addEq(this.acc.scale(dt / TMULT));
+        // TODO: Remove
     }
 
     resetTransition (atTarget = false) {
