@@ -139,6 +139,7 @@ class Tile {
         let posx = player.tar.x,
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
+        player.lastStep = type;
         // Nothing for type < 0 (no Tile)
         if (type === 0) { // Blue tile
             tiles.setTile(-1, posx, posy);
@@ -224,6 +225,7 @@ class Tile {
     }
 
     static onLand(type, dir) {
+        const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity];
         if (type < 0) {
             player.die();
             return 0;
@@ -236,7 +238,15 @@ class Tile {
             }
             return 0;
         }
-        return [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity][type];
+        if (type === 12) {
+            Tile.onStep(0, dir);
+            return 1;
+        }
+        if (type === 13) {
+            Tile.onStep(player.lastStep, dir);
+            return LAND_TBL[player.lastStep];
+        }
+        return LAND_TBL[type];
     }
 }
 Tile.outerColorTable = [
@@ -245,7 +255,8 @@ Tile.outerColorTable = [
     "#F80", "#AAA",
     "#00E", "#E00",
     "#F80", "#F80", "#F80",
-    "#FF0"
+    "#FF0",
+    "#4EE", "#4EE"
 ];
 Tile.innerColorTable = [
     null, null, null,
@@ -253,5 +264,6 @@ Tile.innerColorTable = [
     null, null,
     "#00E", "#E00",
     "#F80", "#E00", "#0E0",
-    null
+    null,
+    "#00E", null
 ];
