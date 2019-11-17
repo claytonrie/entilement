@@ -21,6 +21,7 @@ class TransitObj {
     }
 
     getVel() {
+        const TIME_DUR = 256;
         let velx, vely;
         if (this.time < TIME_DUR) { 
             let EXP = Math.exp(this.time / (this.time - TIME_DUR));
