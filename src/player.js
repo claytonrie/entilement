@@ -1,35 +1,55 @@
 const TMULT = 256;
 class TransitObj {
     constructor (x, y, tx = x, ty = y, vx = 0, vy = 0) {
+        const TIME_DUR = 256;
         this.pos = new Vec2(x, y);
         this.tar = new Vec2(tx, ty);
         this.time = 0;
         this.slopeVar = new Vec2(null, null);
-        this.distVar = new Vec2(null, null);
+        this.distVar = new Vec2(tx - x, ty - y);
+        if (tx === x) {
+            this.slopeVar.x = 0;
+        } else {
+            this.slopeVar.x = vx / (tx - x) + 1 / TIME_DUR;
+        }
+        if (ty === y) {
+            this.slopeVar.y = 0;
+        } else {
+            this.slopeVar.y = vy / (ty - y) + 1 / TIME_DUR;
+        }
         this.atTarget = false;
     }
-    
-    move (dt) {
-        // TODO: Remove
-    }
 
+    getVel() {
+        let velx, vely;
+        if (this.time < TIME_DUR) { 
+            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+            velx = this.distVar.x * EXP * (this.slopeVar.x - 
+                TIME_DUR * (this.slopeVar.x * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+            vely = this.distVar.y * EXP * (this.slopeVar.y - 
+                TIME_DUR * (this.slopeVar.y * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+        } else {
+            velx = vely = 0;
+        }
+        return new Vec2(velx, vely);
+    }
+    
     resetTransition (atTarget = false) {
         const TIME_DUR = 256;
         if (!atTarget) {
-            let velx, vely;
-            if (this.time < TIME_DUR) { 
-                let EXP = Math.exp(1 + TIME_DUR / (this.time - TIME_DUR));
-                velx = this.distVar.x * EXP * (this.slopeVar.x - 
-                    TIME_DUR * (this.slopeVar.x * this.pos.x + 1) / (this.pos.x - TIME_DUR) / (this.pos.x - TIME_DUR));
-                vely = this.distVar.y * EXP * (this.slopeVar.y - 
-                    TIME_DUR * (this.slopeVar.y * this.pos.y + 1) / (this.pos.y - TIME_DUR) / (this.pos.y - TIME_DUR));
-            } else {
-                velx = vely = 0;
-            }
+            let vel = this.getVel();
             this.distVar = this.pos.to(this.tar);
             this.time = 0;
-            this.slopeVar.x = velx / this.distVar.x + 1 / TIME_DUR;
-            this.slopeVar.y = vely / this.distVar.y + 1 / TIME_DUR;
+            if (this.distVar.x === 0) {
+                this.slopeVar.x = 0;
+            } else {
+                this.slopeVar.x = vel.x / this.distVar.x + 1 / TIME_DUR;
+            }
+            if (this.distVar.y === 0) {
+                this.slopeVar.y = 0;
+            } else {
+                this.slopeVar.y = vel.y / this.distVar.y + 1 / TIME_DUR;
+            }
         } else {
             this.pos.x = this.tar.x;
             this.pos.y = this.tar.y;
@@ -43,10 +63,10 @@ class TransitObj {
         if (this.time >= TIME_DUR) {
             this.resetTransition(true);
         } else {
-            let disp = this.pos.to(this.tar), EXP = Math.exp(1 + TIME_DUR / (this.time - TIME_DUR));
-            let newX = this.distVar.x * (this.slopeVar.x * disp.x + 1) * EXP,
-                newY = this.distVar.y * (this.slopeVar.y * disp.y + 1) * EXP;
-            this.pos.x = newX; this.pos.y = newY;
+            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+            let newX = this.distVar.x * (this.slopeVar.x * this.time + 1) * EXP,
+                newY = this.distVar.y * (this.slopeVar.y * this.time + 1) * EXP;
+            this.pos.x = this.tar.x - newX; this.pos.y = this.tar.y - newY;
             this.time += dt;
         }
     }
