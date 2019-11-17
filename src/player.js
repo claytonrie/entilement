@@ -1,67 +1,74 @@
 const TMULT = 256;
 class TransitObj {
     constructor (x, y, tx = x, ty = y, vx = 0, vy = 0) {
+        const TIME_DUR = 256;
         this.pos = new Vec2(x, y);
         this.tar = new Vec2(tx, ty);
-        this.vel = new Vec2(vx, vy);
-        this.acc = new Vec2();
+        this.time = 0;
         this.slopeVar = new Vec2(null, null);
-        this.slopeCounter = new Vec2(null, null);
+        this.distVar = new Vec2(tx - x, ty - y);
+        if (tx === x) {
+            this.slopeVar.x = 0;
+        } else {
+            this.slopeVar.x = vx / (tx - x) + 1 / TIME_DUR;
+        }
+        if (ty === y) {
+            this.slopeVar.y = 0;
+        } else {
+            this.slopeVar.y = vy / (ty - y) + 1 / TIME_DUR;
+        }
         this.atTarget = false;
     }
-    
-    move (dt) {
-        this.pos.addEq(Vec2.scAddSc(dt / TMULT, this.vel,
-            (dt * dt) / (2 * TMULT * TMULT), this.acc));
-        this.vel.addEq(this.acc.scale(dt / TMULT));
-    }
 
+    getVel() {
+        const TIME_DUR = 256;
+        let velx, vely;
+        if (this.time < TIME_DUR) { 
+            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+            velx = this.distVar.x * EXP * (this.slopeVar.x - 
+                TIME_DUR * (this.slopeVar.x * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+            vely = this.distVar.y * EXP * (this.slopeVar.y - 
+                TIME_DUR * (this.slopeVar.y * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+        } else {
+            velx = vely = 0;
+        }
+        return new Vec2(velx, vely);
+    }
+    
     resetTransition (atTarget = false) {
-        this.slopeVar.x = null; this.slopeVar.y = null;
-        this.slopeCounter.x = null;
-        this.slopeCounter.y = null;
+        const TIME_DUR = 256;
+        if (!atTarget) {
+            let vel = this.getVel();
+            this.distVar = this.pos.to(this.tar);
+            this.time = 0;
+            if (this.distVar.x === 0) {
+                this.slopeVar.x = 0;
+            } else {
+                this.slopeVar.x = vel.x / this.distVar.x + 1 / TIME_DUR;
+            }
+            if (this.distVar.y === 0) {
+                this.slopeVar.y = 0;
+            } else {
+                this.slopeVar.y = vel.y / this.distVar.y + 1 / TIME_DUR;
+            }
+        } else {
+            this.pos.x = this.tar.x;
+            this.pos.y = this.tar.y;
+            this.time = TIME_DUR;
+        }
         this.atTarget = atTarget;
     }
 
     smoothTransition (dt) {
-        if (Vec2.sqDist(this.pos, this.tar) < 1 / Drawer.scale) {
-            this.vel.x = this.vel.y = 0;
-            this.acc.x = this.acc.y = 0;
-            this.pos.x = this.tar.x;
-            this.pos.y = this.tar.y;
+        const TIME_DUR = 256;
+        if (this.time >= TIME_DUR) {
             this.resetTransition(true);
         } else {
-            const time = 500 / TMULT / 8;
-            let dist = this.pos.to(this.tar);
-            let vx = this.vel.x, vy = this.vel.y;
-            if (typeof this.slopeVar.x !== "number") {
-                let slope = Math.abs(vx / dist.x) + (1 / time);
-                this.slopeVar.x = isNaN(slope) ? 0 : slope;
-                slope = Math.abs(vy / dist.y) + (1 / time);
-                this.slopeVar.y = isNaN(slope) ? 0 : slope;
-                this.slopeCounter.x = 1; this.slopeCounter.y = 1;
-            }
-            if (Math.abs(dist.x) < 0.5 / Drawer.scale) {
-                this.acc.x = 0;
-                this.vel.x = 0;
-            } else {
-                let basex = vx - this.slopeVar.x * dist.x / this.slopeCounter.x;
-                let divx = Math.abs(basex / dist.x);
-                let accx = (2 * Math.sqrt(divx / time) - divx +
-                    (2 * this.slopeVar.x / this.slopeCounter.x)) * basex;
-                this.acc.x = isNaN(accx) ? 0 : -accx;
-            }
-            if (Math.abs(dist.y) < 0.5 / Drawer.scale) {
-                this.acc.y = 0;
-                this.vel.y = 0;
-            } else {
-                let basey = vy - this.slopeVar.y * dist.y / this.slopeCounter.y;
-                let divy = Math.abs(basey / dist.y);
-                let accy = (2 * Math.sqrt(divy / time) - divy +
-                    (2 * this.slopeVar.y / this.slopeCounter.y)) * basey;
-                this.acc.y = isNaN(accy) ? 0 : -accy;
-            }
-            this.slopeCounter.addEq(this.slopeVar.scale(dt / TMULT));
+            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+            let newX = this.distVar.x * (this.slopeVar.x * this.time + 1) * EXP,
+                newY = this.distVar.y * (this.slopeVar.y * this.time + 1) * EXP;
+            this.pos.x = this.tar.x - newX; this.pos.y = this.tar.y - newY;
+            this.time += dt;
         }
     }
 }
