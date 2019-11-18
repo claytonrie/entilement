@@ -244,7 +244,7 @@ class Tile {
         }
         if (type === 13) {
             Tile.onStep(player.lastStep, dir);
-            return LAND_TBL[player.lastStep];
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         return LAND_TBL[type];
     }
