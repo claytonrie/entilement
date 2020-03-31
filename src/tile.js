@@ -232,6 +232,8 @@ class Tile {
 
     // Return how many spaces we can move
     static onLand(type, dir) {
+        let posx = player.tar.x,
+            posy = player.tar.y;
         const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity, 0, 0, 0];
         if (type <= TILE.NULL) {
             player.die();
@@ -253,17 +255,17 @@ class Tile {
         if (type === TILE.ICE) {
             Tile.onStep(player.lastStep, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+            return Tile.onLand(tiles.getTile(posx, posy), dir);
         }
         if (type === TILE.ICE_RED) {
             Tile.onStep(TILE.RED, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+            return Tile.onLand(tiles.getTile(posx, posy), dir);
         }
         if (type === TILE.ICE_GREEN) {
             Tile.onStep(TILE.GREEN, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+            return Tile.onLand(tiles.getTile(posx, posy), dir);
         }
         return LAND_TBL[type];
     }
