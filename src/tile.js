@@ -1,24 +1,3 @@
-const TILE = {
-    NULL:         -1,
-    BLUE:          0,
-    RED:           1,
-    GREEN:         2,
-    PURPLE:        3,
-    ORANGE:        4,
-    STEEL:         5,
-    DOUBLE_BLUE:   6,
-    DOUBLE_RED:    7,
-    DOUBLE_ORANGE: 8,
-    ORANGE_RED:    9,
-    ORANGE_GREEN: 10,
-    YELLOW:       11,
-    ICE_BLUE:     12,
-    ICE:          13,
-    ICE_RED:      14,
-    ICE_GREEN:    15,
-    WALL:         16
-};
-
 var tiles = new (class {
     constructor () {
         // Tile objects
@@ -280,23 +259,23 @@ class Tile {
     }
 }
 Tile.outerColorTable = [];
-Tile.outerColorTable[TILE.BLUE]          = "#00E";
-Tile.outerColorTable[TILE.RED]           = "#E00";
-Tile.outerColorTable[TILE.GREEN]         = "#0E0";
-Tile.outerColorTable[TILE.PURPLE]        = "#A0A";
-Tile.outerColorTable[TILE.ORANGE]        = "#F80";
-Tile.outerColorTable[TILE.STEEL]         = "#AAA";
-Tile.outerColorTable[TILE.DOUBLE_BLUE]   = "#00E";
-Tile.outerColorTable[TILE.DOUBLE_RED]    = "#E00";
-Tile.outerColorTable[TILE.DOUBLE_ORANGE] = "#F80";
-Tile.outerColorTable[TILE.ORANGE_RED]    = "#F80";
-Tile.outerColorTable[TILE.ORANGE_GREEN]  = "#F80";
-Tile.outerColorTable[TILE.YELLOW]        = "#FF0";
-Tile.outerColorTable[TILE.ICE_BLUE]      = "#4EE";
-Tile.outerColorTable[TILE.ICE]           = "#4EE";
-Tile.outerColorTable[TILE.ICE_RED]       = "#4EE";
-Tile.outerColorTable[TILE.ICE_GREEN]     = "#4EE";
-Tile.outerColorTable[TILE.WALL]          = "#AAA";
+Tile.outerColorTable[TILE.BLUE]          = COLOR.BLUE;
+Tile.outerColorTable[TILE.RED]           = COLOR.RED;
+Tile.outerColorTable[TILE.GREEN]         = COLOR.GREEN;
+Tile.outerColorTable[TILE.PURPLE]        = COLOR.PURPLE;
+Tile.outerColorTable[TILE.ORANGE]        = COLOR.ORANGE;
+Tile.outerColorTable[TILE.STEEL]         = COLOR.STEEL;
+Tile.outerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
+Tile.outerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
+Tile.outerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
+Tile.outerColorTable[TILE.ORANGE_RED]    = COLOR.ORANGE;
+Tile.outerColorTable[TILE.ORANGE_GREEN]  = COLOR.ORANGE;
+Tile.outerColorTable[TILE.YELLOW]        = COLOR.YELLOW;
+Tile.outerColorTable[TILE.ICE_BLUE]      = COLOR.ICE;
+Tile.outerColorTable[TILE.ICE]           = COLOR.ICE;
+Tile.outerColorTable[TILE.ICE_RED]       = COLOR.ICE;
+Tile.outerColorTable[TILE.ICE_GREEN]     = COLOR.ICE;
+Tile.outerColorTable[TILE.WALL]          = COLOR.STEEL;
 
 Tile.innerColorTable = [];
 Tile.innerColorTable[TILE.BLUE]          = null;
@@ -305,14 +284,14 @@ Tile.innerColorTable[TILE.GREEN]         = null;
 Tile.innerColorTable[TILE.PURPLE]        = null;
 Tile.innerColorTable[TILE.ORANGE]        = null;
 Tile.innerColorTable[TILE.STEEL]         = null;
-Tile.innerColorTable[TILE.DOUBLE_BLUE]   = "#00E";
-Tile.innerColorTable[TILE.DOUBLE_RED]    = "#E00";
-Tile.innerColorTable[TILE.DOUBLE_ORANGE] = "#F80";
-Tile.innerColorTable[TILE.ORANGE_RED]    = "#E00";
-Tile.innerColorTable[TILE.ORANGE_GREEN]  = "#0E0";
+Tile.innerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
+Tile.innerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
+Tile.innerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
+Tile.innerColorTable[TILE.ORANGE_RED]    = COLOR.RED;
+Tile.innerColorTable[TILE.ORANGE_GREEN]  = COLOR.GREEN;
 Tile.innerColorTable[TILE.YELLOW]        = null;
-Tile.innerColorTable[TILE.ICE_BLUE]      = "#00E";
+Tile.innerColorTable[TILE.ICE_BLUE]      = COLOR.BLUE;
 Tile.innerColorTable[TILE.ICE]           = null;
-Tile.innerColorTable[TILE.ICE_RED]       = "#E00";
-Tile.innerColorTable[TILE.ICE_GREEN]     = "#0E0";
-Tile.innerColorTable[TILE.WALL]          = "#AAA";
+Tile.innerColorTable[TILE.ICE_RED]       = COLOR.RED;
+Tile.innerColorTable[TILE.ICE_GREEN]     = COLOR.GREEN;
+Tile.innerColorTable[TILE.WALL]          = COLOR.STEEL;
