@@ -1,13 +1,16 @@
 var tiles = new (class {
-    constructor () {
+    constructor (tMax, taMax) {
         // Tile objects
-        this.type = [];
-        this.x = []; this.y = [];
+        this.type = new Uint8Array(tMax);
+        this.x = new Int8Array(tMax);
+        this.y = new Int8Array(tMax);
         this.length = 0;
         // Tile Animations
-        this.atype = [];
-        this.ax = []; this.ay = [];
-        this.atime = []; this.amisc = [];
+        this.atype = new Uint8Array(taMax);
+        this.ax = new Int16Array(taMax);
+        this.ay = new Int16Array(taMax);
+        this.atime = new Uint16Array(taMax);
+        //this.amisc = [];
         this.alength = 0;
     }
 
@@ -27,10 +30,13 @@ var tiles = new (class {
         let i = this.length - 1;
         for (; i >= 0; i -= 1) {
             if (this.x[i] === bx && this.y[i] === by) {
-                if (type === -1) {
-                    this.type.splice(i, 1);
-                    this.x.splice(i, 1); this.y.splice(i, 1);
+                if (type === TILE.NULL) {
                     this.length -= 1;
+                    if (i < this.length) {
+                        this.type[i] = this.type[this.length];
+                        this.x[i] = this.x[this.length];
+                        this.y[i] = this.y[this.length];
+                    }
                 } else {
                     this.type[i] = type;
                 }
@@ -99,26 +105,26 @@ var tiles = new (class {
             }
         }
     }
-})();
+})(256, 256);
 tiles.maxX = 60;
 tiles.maxY = 60;
 
 class Tile {
     constructor (type, x, y, divide = true) {
-        tiles.type.push(type);
+        tiles.type[tiles.length] = type;
         // Position divided by 16
         if (divide) {
             if ((x / 16) | 0 > tiles.maxX || (y / 16) | 0 > tiles.maxY) {
                 throw new Error(`Tile out of bounds at position (${(x / 16) | 0}, ${(y / 16) | 0})`);
             }
-            tiles.x.push((x / 16) | 0);
-            tiles.y.push((y / 16) | 0);
+            tiles.x[tiles.length] = (x / 16) | 0;
+            tiles.y[tiles.length] = (y / 16) | 0;
         } else {
             if ((x | 0) > tiles.maxX || (y | 0) > tiles.maxY) {
                 throw new Error(`Tile out of bounds at position (${x | 0}, ${y | 0})`);
             }
-            tiles.x.push(x | 0);
-            tiles.y.push(y | 0);
+            tiles.x[tiles.length] = x | 0;
+            tiles.y[tiles.length] = y | 0;
         }
         tiles.length += 1;
         return true;
