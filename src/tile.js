@@ -1,3 +1,24 @@
+const TILE = {
+    NULL:         -1,
+    BLUE:          0,
+    RED:           1,
+    GREEN:         2,
+    PURPLE:        3,
+    ORANGE:        4,
+    STEEL:         5,
+    DOUBLE_BLUE:   6,
+    DOUBLE_RED:    7,
+    DOUBLE_ORANGE: 8,
+    ORANGE_RED:    9,
+    ORANGE_GREEN: 10,
+    YELLOW:       11,
+    ICE_BLUE:     12,
+    ICE:          13,
+    ICE_RED:      14,
+    ICE_GREEN:    15,
+    WALL:         16
+};
+
 var tiles = new (class {
     constructor () {
         // Tile objects
@@ -78,7 +99,7 @@ var tiles = new (class {
 
     checkEnding () {
         let i = this.length - 1;
-        const exceptions = [3, 5];
+        const exceptions = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
         for (; i >= 0; i -= 1) {
             if (!exceptions.includes(this.type[i])) {
                 return false;
@@ -141,76 +162,76 @@ class Tile {
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
         // Nothing for type < 0 (no Tile)
-        if (type === 0) { // Blue tile
+        if (type === TILE.BLUE) { // Blue tile
             tiles.setTile(-1, posx, posy);
             new TileAnimation(0, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
-        if (type === 1) { // Red tile
+        if (type === TILE.RED) { // Red tile
             tiles.setTile(-1, posx, posy);
             new TileAnimation(1, posx, posy);
             player.tar.addEq(dir.scale(2 * 16));
             player.resetTransition();
             return;
         }
-        if (type === 2) { // Green tile
+        if (type === TILE.GREEN) { // Green tile
             tiles.setTile(-1, posx, posy);
             new TileAnimation(2, posx, posy);
             player.tar.addEq(dir.scale(3 * 16));
             player.resetTransition();
             return;
         }
-        // Nothing for type 3 (Purple tile)
-        if (type === 4) { // Orange Tile
+        // Nothing for Purple tiles (ends the level)
+        if (type === TILE.ORANGE) { // Orange Tile
             tiles.setTile(0, posx, posy); // Change to Blue tile
             new TileAnimation(4, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
-        if (type === 5) { // Steel tile (never breaks)
+        if (type === TILE.STEEL) { // Steel tile (never breaks)
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
-        if (type === 6) { // Double Blue (goes diagonal)
+        if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
             tiles.setTile(-1, posx, posy);
             new TileAnimation(6, posx, posy);
             player.tar.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
             player.resetTransition();
             return;
         }
-        if (type === 7) { // Double Red
+        if (type === TILE.DOUBLE_RED) { // Double Red
             tiles.setTile(-1, posx, posy);
             new TileAnimation(7, posx, posy);
             player.tar.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
             player.resetTransition();
             return;
         }
-        if (type === 8) { // Double Orange (takes 3 steps)
+        if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
             tiles.setTile(4, posx, posy); // Change to an orange tile
             new TileAnimation(8, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
-        if (type === 9) { // Orange Red
+        if (type === TILE.ORANGE_RED) { // Orange Red
             tiles.setTile(1, posx, posy); // Change to a red tile
             new TileAnimation(9, posx, posy);
             player.tar.addEq(dir.scale(2 * 16));
             player.resetTransition();
             return;
         }
-        if (type === 10) { // Orange Green
+        if (type === TILE.ORANGE_GREEN) { // Orange Green
             tiles.setTile(2, posx, posy); // Change to a green tile
             new TileAnimation(10, posx, posy);
             player.tar.addEq(dir.scale(3 * 16));
             player.resetTransition();
             return;
         }
-        if (type === 11) { // Yellow tile
+        if (type === TILE.YELLOW) { // Yellow tile
             tiles.setTile(-1, posx, posy);
             new TileAnimation(11, posx, posy);
             if (dir.x !== 0) {
@@ -224,13 +245,14 @@ class Tile {
         throw new Error("Invalid Tile Type");
     }
 
+    // Return how many spaces we can move
     static onLand(type, dir) {
-        const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity];
-        if (type < 0) {
+        const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity, 0, 0, 0];
+        if (type <= TILE.NULL) {
             player.die();
             return 0;
         }
-        if (type === 3) { // Purple tile (ends level)
+        if (type === TILE.PURPLE) { // Purple tile (ends level)
             if (tiles.checkEnding()) {
                 level.next();
             } else {
@@ -238,32 +260,59 @@ class Tile {
             }
             return 0;
         }
-        if (type === 12) {
-            Tile.onStep(0, dir);
+        if (type === TILE.ICE_BLUE) {
+            Tile.onStep(TILE.BLUE, dir);
             return 1;
         }
-        if (type === 13) {
+        if (type === TILE.ICE) {
             Tile.onStep(player.lastStep, dir);
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+        }
+        if (type === TILE.ICE_RED) {
+            Tile.onStep(TILE.RED, dir);
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+        }
+        if (type === TILE.ICE_GREEN) {
+            Tile.onStep(TILE.GREEN, dir);
             return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         return LAND_TBL[type];
     }
 }
-Tile.outerColorTable = [
-    "#00E", "#E00", "#0E0",
-    "#A0A",
-    "#F80", "#AAA",
-    "#00E", "#E00",
-    "#F80", "#F80", "#F80",
-    "#FF0",
-    "#4EE", "#4EE"
-];
-Tile.innerColorTable = [
-    null, null, null,
-    null,
-    null, null,
-    "#00E", "#E00",
-    "#F80", "#E00", "#0E0",
-    null,
-    "#00E", null
-];
+Tile.outerColorTable = [];
+Tile.outerColorTable[TILE.BLUE]          = "#00E";
+Tile.outerColorTable[TILE.RED]           = "#E00";
+Tile.outerColorTable[TILE.GREEN]         = "#0E0";
+Tile.outerColorTable[TILE.PURPLE]        = "#A0A";
+Tile.outerColorTable[TILE.ORANGE]        = "#F80";
+Tile.outerColorTable[TILE.STEEL]         = "#AAA";
+Tile.outerColorTable[TILE.DOUBLE_BLUE]   = "#00E";
+Tile.outerColorTable[TILE.DOUBLE_RED]    = "#E00";
+Tile.outerColorTable[TILE.DOUBLE_ORANGE] = "#F80";
+Tile.outerColorTable[TILE.ORANGE_RED]    = "#F80";
+Tile.outerColorTable[TILE.ORANGE_GREEN]  = "#F80";
+Tile.outerColorTable[TILE.YELLOW]        = "#FF0";
+Tile.outerColorTable[TILE.ICE_BLUE]      = "#4EE";
+Tile.outerColorTable[TILE.ICE]           = "#4EE";
+Tile.outerColorTable[TILE.ICE_RED]       = "#4EE";
+Tile.outerColorTable[TILE.ICE_GREEN]     = "#4EE";
+Tile.outerColorTable[TILE.WALL]          = "#AAA";
+
+Tile.innerColorTable = [];
+Tile.innerColorTable[TILE.BLUE]          = null;
+Tile.innerColorTable[TILE.RED]           = null;
+Tile.innerColorTable[TILE.GREEN]         = null;
+Tile.innerColorTable[TILE.PURPLE]        = null;
+Tile.innerColorTable[TILE.ORANGE]        = null;
+Tile.innerColorTable[TILE.STEEL]         = null;
+Tile.innerColorTable[TILE.DOUBLE_BLUE]   = "#00E";
+Tile.innerColorTable[TILE.DOUBLE_RED]    = "#E00";
+Tile.innerColorTable[TILE.DOUBLE_ORANGE] = "#F80";
+Tile.innerColorTable[TILE.ORANGE_RED]    = "#E00";
+Tile.innerColorTable[TILE.ORANGE_GREEN]  = "#0E0";
+Tile.innerColorTable[TILE.YELLOW]        = null;
+Tile.innerColorTable[TILE.ICE_BLUE]      = "#00E";
+Tile.innerColorTable[TILE.ICE]           = null;
+Tile.innerColorTable[TILE.ICE_RED]       = "#E00";
+Tile.innerColorTable[TILE.ICE_GREEN]     = "#0E0";
+Tile.innerColorTable[TILE.WALL]          = "#AAA";
