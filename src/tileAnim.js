@@ -10,13 +10,15 @@ class TileAnimation {
 
     static advanceDraw(dt, ind) {
         tiles.atime[ind] += dt;
-        if (TileAnimation[`animate${tiles.atype[ind]}`](dt, ind)) {
+        if (TileAnimation.animate[tiles.atype[ind]](dt, ind)) {
             // Delete tile animation if done
-            tiles.atype.splice(ind, 1);
-            tiles.ax.splice(ind, 1);
-            tiles.ay.splice(ind, 1);
-            tiles.atime.splice(ind, 1);
             tiles.alength -= 1;
+            if (ind < tiles.alength) {
+                tiles.atype[ind] = tiles.atype[tiles.alength];
+                tiles.ax[ind] = tiles.ax[tiles.alength];
+                tiles.ay[ind] = tiles.ay[tiles.alength];
+                tiles.atime[ind] = tiles.atime[tiles.alength];
+            }
             return false;
         }
         return true;
