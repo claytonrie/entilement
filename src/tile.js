@@ -1,102 +1,91 @@
 var tiles = new (class {
-    constructor (tMax, taMax) {
+    constructor (maxX, maxY) {
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.max  = maxX * maxY;
+        this.count = 0;
         // Tile objects
-        this.type = new Uint8Array(tMax);
-        this.x = new Int8Array(tMax);
-        this.y = new Int8Array(tMax);
-        this.length = 0;
+        // Format:
+        //   INDEX = (x + maxX * y)
+        //   VALUE = tile type
+        this.type = new Int8Array(this.max); 
+        let i = tMax - 1;
+        for (; i >= 0; i -= 1) {
+            this.type[i] = TILE.NULL;
+        }
+        
         // Tile Animations
-        this.atype = new Uint8Array(taMax);
-        this.ax = new Int16Array(taMax);
-        this.ay = new Int16Array(taMax);
-        this.atime = new Uint16Array(taMax);
-        //this.amisc = [];
+        this.atype = new Uint8Array(this.max);
+        this.ax = new Int16Array(this.max);
+        this.ay = new Int16Array(this.max);
+        this.atime = new Uint16Array(this.max);
         this.alength = 0;
     }
 
     getTile (x, y) {
+        // Calculate the tile x and y grid positions
         let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let i = this.length - 1;
-        for (; i >= 0; i -= 1) {
-            if (this.x[i] === bx && this.y[i] === by) {
-                return this.type[i];
-            }
-        }
-        return -1;
+        return this.type[bx + this.maxX * by];
     }
 
     setTile (type, x, y) {
+        // Calculate the tile x and y grid positions
         let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let i = this.length - 1;
-        for (; i >= 0; i -= 1) {
-            if (this.x[i] === bx && this.y[i] === by) {
-                if (type === TILE.NULL) {
-                    this.length -= 1;
-                    if (i < this.length) {
-                        this.type[i] = this.type[this.length];
-                        this.x[i] = this.x[this.length];
-                        this.y[i] = this.y[this.length];
-                    }
-                } else {
-                    this.type[i] = type;
-                }
-                return false;
+        let didExist = this.type[bx + this.maxX * by] > TILE.NULL;
+        // Change the type
+        this.type[bx + this.maxX * by] = type;
+        
+        // Handle updating the total number of tiles
+        const staticTiles = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
+        if (!didExist && (type > TILE.NULL)) {
+            // If the tile can't disappear, don't add it to the count
+            if (!staticTiles.includes(type)) {
+                this.count += 1;
             }
+            return true;
+        } else if (didExist && (type <= TILE.NULL)) {
+            this.count -= 1;
         }
-        new Tile(type, bx, by, false);
-        return true;
+        return false;
     }
 
     searchHorz(x, y, backwards = false) {
+        // Calculate the tile x and y grid positions
         let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let i = this.length - 1;
-        let bound = backwards ? 0 : tiles.maxX, sign = backwards ? -1 : 1;
-        for (; i >= 0; i -= 1) {
-            if (this.y[i] === by) {
-                if (sign * this.x[i] < sign * bound &&
-                        sign * this.x[i] >= sign * bx) {
-                    bound = this.x[i];
-                    if (bound === bx) {
-                        return bx;
-                    }
-                }
+        if (backwards) {
+            for (; bx >= 0; bx -= 1) {
+                if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
+            }
+        } else {
+            for (; bx < tiles.maxX; bx += 1) {
+                if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
             }
         }
-        return bound;
+        return bx;
     }
     searchVert(x, y, backwards = false) {
+        // Calculate the tile x and y grid positions
         let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let i = this.length - 1;
-        let bound = backwards ? 0 : tiles.maxY, sign = backwards ? -1 : 1;
-        for (; i >= 0; i -= 1) {
-            if (this.x[i] === bx) {
-                if (sign * this.y[i] < sign * bound &&
-                        sign * this.y[i] >= sign * by) {
-                    bound = this.y[i];
-                    if (bound === by) {
-                        return by;
-                    }
-                }
+        if (backwards) {
+            for (; by >= 0; by -= 1) {
+                if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
+            }
+        } else {
+            for (; by < tiles.maxY; by += 1) {
+                if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
             }
         }
-        return bound;
+        return by;
     }
-
+    
     checkEnding () {
-        let i = this.length - 1;
-        const exceptions = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
-        for (; i >= 0; i -= 1) {
-            if (!exceptions.includes(this.type[i])) {
-                return false;
-            }
-        }
-        return true;
+        return this.count === 0;
     }
 
     drawAll(dt) {
-        let i = this.length - 1;
+        let i = this.max - 1;
         for (; i >= 0; i -= 1) {
-            Tile.draw(this.type[i], this.x[i] * 16, this.y[i] * 16);
+            Tile.draw(this.type[i], 16 * (i % this.maxX), 16 * ((i / this.maxX) | 0));
         }
         i = this.alength - 1;
         if (i >= 0) {
@@ -105,28 +94,22 @@ var tiles = new (class {
             }
         }
     }
-})(256, 256);
-tiles.maxX = 60;
-tiles.maxY = 60;
+})(16, 16);
 
 class Tile {
     constructor (type, x, y, divide = true) {
-        tiles.type[tiles.length] = type;
+        let bx, by;
         // Position divided by 16
         if (divide) {
-            if ((x / 16) | 0 > tiles.maxX || (y / 16) | 0 > tiles.maxY) {
-                throw new Error(`Tile out of bounds at position (${(x / 16) | 0}, ${(y / 16) | 0})`);
-            }
-            tiles.x[tiles.length] = (x / 16) | 0;
-            tiles.y[tiles.length] = (y / 16) | 0;
+            bx = (x / 16) | 0; by = (y / 16) | 0;
         } else {
-            if ((x | 0) > tiles.maxX || (y | 0) > tiles.maxY) {
-                throw new Error(`Tile out of bounds at position (${x | 0}, ${y | 0})`);
-            }
-            tiles.x[tiles.length] = x | 0;
-            tiles.y[tiles.length] = y | 0;
+            bx = x | 0; by = y | 0;
         }
-        tiles.length += 1;
+        if (bx > tiles.maxX || by > tiles.maxY) {
+            throw new Error(`Tile out of bounds at position (${bx}, ${by})`);
+        }
+        tiles.type[bx + tiles.maxX * by] = type;
+        tiles.count += 1;
         return true;
     }
 
@@ -148,30 +131,30 @@ class Tile {
         player.lastStep = type;
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) { // Blue tile
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(0, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.BLUE, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
         if (type === TILE.RED) { // Red tile
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(1, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.RED, posx, posy);
             player.tar.addEq(dir.scale(2 * 16));
             player.resetTransition();
             return;
         }
         if (type === TILE.GREEN) { // Green tile
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(2, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.GREEN, posx, posy);
             player.tar.addEq(dir.scale(3 * 16));
             player.resetTransition();
             return;
         }
         // Nothing for Purple tiles (ends the level)
         if (type === TILE.ORANGE) { // Orange Tile
-            tiles.setTile(0, posx, posy); // Change to Blue tile
-            new TileAnimation(4, posx, posy);
+            tiles.setTile(TILE.BLUE, posx, posy); // Change to Blue tile
+            new TileAnimation(TILE_ANIM.ORANGE, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
@@ -182,43 +165,43 @@ class Tile {
             return;
         }
         if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(6, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.DOUBLE_BLUE, posx, posy);
             player.tar.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
             player.resetTransition();
             return;
         }
         if (type === TILE.DOUBLE_RED) { // Double Red
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(7, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.DOUBLE_RED, posx, posy);
             player.tar.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
             player.resetTransition();
             return;
         }
         if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
-            tiles.setTile(4, posx, posy); // Change to an orange tile
-            new TileAnimation(8, posx, posy);
+            tiles.setTile(TILE.ORANGE, posx, posy); // Change to an orange tile
+            new TileAnimation(TILE_ANIM.DOUBLE_ORANGE, posx, posy);
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
         }
         if (type === TILE.ORANGE_RED) { // Orange Red
-            tiles.setTile(1, posx, posy); // Change to a red tile
-            new TileAnimation(9, posx, posy);
+            tiles.setTile(TILE.RED, posx, posy); // Change to a red tile
+            new TileAnimation(TILE_ANIM.ORANGE_RED, posx, posy);
             player.tar.addEq(dir.scale(2 * 16));
             player.resetTransition();
             return;
         }
         if (type === TILE.ORANGE_GREEN) { // Orange Green
-            tiles.setTile(2, posx, posy); // Change to a green tile
-            new TileAnimation(10, posx, posy);
+            tiles.setTile(TILE.GREEN, posx, posy); // Change to a green tile
+            new TileAnimation(TILE_ANIM.ORANGE_GREEN, posx, posy);
             player.tar.addEq(dir.scale(3 * 16));
             player.resetTransition();
             return;
         }
         if (type === TILE.YELLOW) { // Yellow tile
-            tiles.setTile(-1, posx, posy);
-            new TileAnimation(11, posx, posy);
+            tiles.setTile(TILE.NULL, posx, posy);
+            new TileAnimation(TILE_ANIM.YELLOW, posx, posy);
             if (dir.x !== 0) {
                 player.tar.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
             } else {
