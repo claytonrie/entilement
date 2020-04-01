@@ -250,22 +250,22 @@ class Tile {
         if (type === TILE.ICE_BLUE) {
             Tile.onStep(TILE.BLUE, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return 1;
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         if (type === TILE.ICE) {
             Tile.onStep(player.lastStep, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(posx, posy), dir);
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         if (type === TILE.ICE_RED) {
             Tile.onStep(TILE.RED, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(posx, posy), dir);
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         if (type === TILE.ICE_GREEN) {
             Tile.onStep(TILE.GREEN, dir);
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
-            return Tile.onLand(tiles.getTile(posx, posy), dir);
+            return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         return LAND_TBL[type];
     }
