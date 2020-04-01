@@ -28,22 +28,32 @@ var tiles = new (class {
         return this.type[bx + this.maxX * by];
     }
 
-    setTile (type, x, y) {
+    setTile (type, x, y, doUndo = true, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let didExist = this.type[bx + this.maxX * by] > TILE.NULL;
+        let bx, by, ind;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx |= 0; by |= 0;
+        }
+        ind = bx + this.maxX * by;
+        let prevType = this.type[ind];
         // Change the type
-        this.type[bx + this.maxX * by] = type;
-        
+        this.type[ind] = type;
+        // Handle storing this tile update
+        if (doUndo) {
+            UndoHandler.addTileUpdate(prevType, ind);
+        }
         // Handle updating the total number of tiles
         const staticTiles = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
-        if (!didExist && (type > TILE.NULL)) {
+        if ((prevType <= TILE.NULL) && (type > TILE.NULL)) {
             // If the tile can't disappear, don't add it to the count
             if (!staticTiles.includes(type)) {
                 this.count += 1;
             }
             return true;
-        } else if (didExist && (type <= TILE.NULL)) {
+        } else if ((prevType > TILE.NULL) && (type <= TILE.NULL)) {
             this.count -= 1;
         }
         return false;
