@@ -35,7 +35,7 @@ var tiles = new (class {
             bx = (x / 16) | 0;
             by = (y / 16) | 0;
         } else {
-            bx |= 0; by |= 0;
+            bx = x | 0; by = y | 0;
         }
         ind = bx + this.maxX * by;
         let prevType = this.type[ind];
