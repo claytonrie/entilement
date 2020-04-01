@@ -22,10 +22,28 @@ var tiles = new (class {
         this.alength = 0;
     }
 
-    getTile (x, y) {
+    getTile (x, y, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
         return this.type[bx + this.maxX * by];
+    }
+    
+    getIndex (x, y, doDivide = true) {
+        // Calculate the tile x and y grid positions
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
+        return bx + this.maxX * by;
     }
 
     setTile (type, x, y, doUndo = true, doDivide = true) {
@@ -59,9 +77,15 @@ var tiles = new (class {
         return false;
     }
 
-    searchHorz(x, y, backwards = false) {
+    searchHorz(x, y, backwards = false, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
         if (backwards) {
             for (; bx >= 0; bx -= 1) {
                 if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
@@ -73,9 +97,15 @@ var tiles = new (class {
         }
         return bx;
     }
-    searchVert(x, y, backwards = false) {
+    searchVert(x, y, backwards = false, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
         if (backwards) {
             for (; by >= 0; by -= 1) {
                 if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
@@ -128,7 +158,7 @@ class Tile {
     static draw(type, x, y) {
         let dx = x - (x % 16),
             dy = y - (y % 16);
-        if (Tile.innerColorTable[type] !== null) {
+        if (TILE_COLOR.INNER_TBL[type] !== null) {
             Drawer.color = TILE_COLOR.INNER_TBL[type];
             Drawer.drawRect(false, dx, dy, 16, 16, 0.75);
         }
@@ -172,6 +202,7 @@ class Tile {
             return;
         }
         if (type === TILE.STEEL) { // Steel tile (never breaks)
+            UndoHandler.addTileUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
