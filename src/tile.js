@@ -234,6 +234,7 @@ class Tile {
     static onLand(type, dir) {
         let posx = player.tar.x,
             posy = player.tar.y;
+        posx -= posx % 16; posy -= posy % 16;
         const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity, 0, 0, 0];
         if (type <= TILE.NULL) {
             player.die();
