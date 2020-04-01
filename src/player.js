@@ -76,10 +76,15 @@ class TransitObj {
 var player = new (class extends TransitObj {
     constructor (x = 0, y = 0) {
         super(x, y);
+        this.canMove = true;
+        this.isValid = {
+            w: true, a: true,
+            s: true, d: true
+        };
     }
 
     die () {
-        Game.mode = 3;
+        this.canMove = false;
     }
 
     draw () {
