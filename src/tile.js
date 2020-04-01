@@ -85,7 +85,9 @@ var tiles = new (class {
     drawAll(dt) {
         let i = this.max - 1;
         for (; i >= 0; i -= 1) {
-            Tile.draw(this.type[i], 16 * (i % this.maxX), 16 * ((i / this.maxX) | 0));
+            if (this.type[i] > TILE.NULL) {
+                Tile.draw(this.type[i], 16 * (i % this.maxX), 16 * ((i / this.maxX) | 0));
+            }
         }
         i = this.alength - 1;
         if (i >= 0) {
