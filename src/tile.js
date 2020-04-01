@@ -129,10 +129,10 @@ class Tile {
         let dx = x - (x % 16),
             dy = y - (y % 16);
         if (Tile.innerColorTable[type] !== null) {
-            Drawer.color = Tile.innerColorTable[type];
+            Drawer.color = TILE_COLOR.INNER_TBL[type];
             Drawer.drawRect(false, dx, dy, 16, 16, 0.75);
         }
-        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[type]);
+        Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[type]);
         Drawer.drawRect(true, dx, dy, 16, 16);
     }
 
@@ -230,7 +230,6 @@ class Tile {
         let posx = player.tar.x,
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
-        const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity, 0, 0, 0];
         if (type <= TILE.NULL) {
             player.die();
             return 0;
@@ -263,43 +262,6 @@ class Tile {
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
             return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
-        return LAND_TBL[type];
+        return TILE_TRAVEL_TBL[type];
     }
 }
-Tile.outerColorTable = [];
-Tile.outerColorTable[TILE.BLUE]          = COLOR.BLUE;
-Tile.outerColorTable[TILE.RED]           = COLOR.RED;
-Tile.outerColorTable[TILE.GREEN]         = COLOR.GREEN;
-Tile.outerColorTable[TILE.PURPLE]        = COLOR.PURPLE;
-Tile.outerColorTable[TILE.ORANGE]        = COLOR.ORANGE;
-Tile.outerColorTable[TILE.STEEL]         = COLOR.STEEL;
-Tile.outerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
-Tile.outerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
-Tile.outerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
-Tile.outerColorTable[TILE.ORANGE_RED]    = COLOR.ORANGE;
-Tile.outerColorTable[TILE.ORANGE_GREEN]  = COLOR.ORANGE;
-Tile.outerColorTable[TILE.YELLOW]        = COLOR.YELLOW;
-Tile.outerColorTable[TILE.ICE_BLUE]      = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE]           = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE_RED]       = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE_GREEN]     = COLOR.ICE;
-Tile.outerColorTable[TILE.WALL]          = COLOR.STEEL;
-
-Tile.innerColorTable = [];
-Tile.innerColorTable[TILE.BLUE]          = null;
-Tile.innerColorTable[TILE.RED]           = null;
-Tile.innerColorTable[TILE.GREEN]         = null;
-Tile.innerColorTable[TILE.PURPLE]        = null;
-Tile.innerColorTable[TILE.ORANGE]        = null;
-Tile.innerColorTable[TILE.STEEL]         = null;
-Tile.innerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
-Tile.innerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
-Tile.innerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
-Tile.innerColorTable[TILE.ORANGE_RED]    = COLOR.RED;
-Tile.innerColorTable[TILE.ORANGE_GREEN]  = COLOR.GREEN;
-Tile.innerColorTable[TILE.YELLOW]        = null;
-Tile.innerColorTable[TILE.ICE_BLUE]      = COLOR.BLUE;
-Tile.innerColorTable[TILE.ICE]           = null;
-Tile.innerColorTable[TILE.ICE_RED]       = COLOR.RED;
-Tile.innerColorTable[TILE.ICE_GREEN]     = COLOR.GREEN;
-Tile.innerColorTable[TILE.WALL]          = COLOR.STEEL;
