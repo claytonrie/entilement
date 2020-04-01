@@ -9,7 +9,7 @@ var tiles = new (class {
         //   INDEX = (x + maxX * y)
         //   VALUE = tile type
         this.type = new Int8Array(this.max); 
-        let i = tMax - 1;
+        let i = this.max - 1;
         for (; i >= 0; i -= 1) {
             this.type[i] = TILE.NULL;
         }
