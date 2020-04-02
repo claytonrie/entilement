@@ -31,6 +31,9 @@ var tiles = new (class {
         } else {
             bx = x | 0; by = y | 0;
         }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return TILE.NULL;
+        }
         return this.type[bx + this.maxX * by];
     }
     
@@ -43,6 +46,9 @@ var tiles = new (class {
         } else {
             bx = x | 0; by = y | 0;
         }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return -1;
+        }
         return bx + this.maxX * by;
     }
 
@@ -54,6 +60,9 @@ var tiles = new (class {
             by = (y / 16) | 0;
         } else {
             bx = x | 0; by = y | 0;
+        }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return false;
         }
         ind = bx + this.maxX * by;
         let prevType = this.type[ind];
