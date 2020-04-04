@@ -42,6 +42,15 @@ var TILE_ANIM = {
     ICE:          13
 };
 
+var KEY = {
+    UP:   "w", DOWN:  "s",
+    LEFT: "a", RIGHT: "d",
+    UNDO: "z", REDO:  "r",
+    SKIP: "e", BACK:  "q"
+    // DISP: "p", DISP_UP: "k",
+    // DISP_DOWN: "i"
+};
+
 var TILE_COLOR = { OUTER_TBL: [], INNER_TBL: [] };
 
 TILE_COLOR.OUTER_TBL[TILE.BLUE]   = COLOR.BLUE;
