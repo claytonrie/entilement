@@ -83,6 +83,34 @@ var player = new (class extends TransitObj {
         };
     }
 
+    moveDirection (dir) {
+        if (dir.x === 0) {
+            if (dir.y === -1) {
+                if (!this.isValid.w) { return false; }
+                //this.currMoves += "w";
+            } else if (dir.y === 1) {
+                if (!this.isValid.s) { return false; }
+                //this.currMoves += "s";
+            }
+        } else if (dir.x === -1) {
+            if (!this.isValid.a) { return false; }
+            //player.currMoves += "a";
+        } else if (dir.x === 1) {
+            if (!this.isValid.d) { return false; }
+           //player.currMoves += "d";
+        }
+        UndoHandler.startMove();
+        Tile.onStep(tiles.getTile(player.tar.x, player.tar.y), dir);
+        let len = Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
+        new MoveAnimation(0);
+        if (len) {
+            let moveTo = mover.findTargetting(player.tar.x, player.tar.y);
+            new MoveAnimation(len, moveTo.pos.x, moveTo.pos.y,
+                3, player.tar.x, player.tar.y, new Vec2(),
+                moveTo.getVel());
+        }
+    }
+    
     die () {
         this.canMove = false;
     }
