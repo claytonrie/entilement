@@ -303,16 +303,13 @@ class Tile {
         } else if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
             tiles.setTile(TILE.ORANGE, posx, posy, true, true, true); // Change to an orange tile
             player.scout.addEq(dir.scale(16)); return;
-        }
-        if (type === TILE.ORANGE_RED) { // Orange Red
+        } else if (type === TILE.ORANGE_RED) { // Orange Red
             tiles.setTile(TILE.RED, posx, posy, true, true, true); // Change to a red tile
             player.scout.addEq(dir.scale(2 * 16)); return;
-        }
-        if (type === TILE.ORANGE_GREEN) { // Orange Green
+        } else if (type === TILE.ORANGE_GREEN) { // Orange Green
             tiles.setTile(TILE.GREEN, posx, posy, true, true, true); // Change to a green tile
             player.scout.addEq(dir.scale(3 * 16)); return;
-        }
-        if (type === TILE.YELLOW) { // Yellow tile
+        } else if (type === TILE.YELLOW) { // Yellow tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
             if (dir.x !== 0) {
                 player.scout.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
@@ -321,7 +318,6 @@ class Tile {
             }
             return;
         }
-        throw new Error("Invalid Tile Type");
     }
 
     // Return how many spaces we can move
