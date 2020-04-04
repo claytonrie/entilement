@@ -106,15 +106,25 @@ var player = new (class extends TransitObj {
            //player.currMoves += "d";
         }
         UndoHandler.startMove();
-        Tile.onStep(tiles.getTile(player.tar.x, player.tar.y), dir);
-        let len = Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
-        new MoveAnimation(0);
-        if (len) {
-            let moveTo = mover.findTargetting(player.tar.x, player.tar.y);
-            new MoveAnimation(len, moveTo.pos.x, moveTo.pos.y,
-                3, player.tar.x, player.tar.y, new Vec2(),
-                moveTo.getVel());
-        }
+        Tile.onStep(tiles.getTile(this.tar.x, this.tar.y), dir);
+        return Tile.onLand(tiles.getTile(this.tar.x, this.tar.y), dir);
+    }
+    
+    scoutAllMoves () {
+    	let dir = new Vec2();
+        UndoHandler.startScout();
+        dir.y = -1; this.isValid.up    = this.scoutMove(dir);
+        dir.y =  1; this.isValid.down  = this.scoutMove(dir);
+        dir.y =  0;
+        dir.x = -1; this.isValid.left  = this.scoutMove(dir);
+        dir.x =  1; this.isValid.right = this.scoutMove(dir);
+    }
+    
+    scoutMove (dir) {
+        Tile.onStepScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        let ret =  Tile.onLandScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        UndoHandler.undoScout();
+        return ret;
     }
     
     /*handlePreviousMoves() {
