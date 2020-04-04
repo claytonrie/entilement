@@ -310,7 +310,7 @@ class Tile {
         }
         if (type === TILE.ORANGE_GREEN) { // Orange Green
             tiles.setTile(TILE.GREEN, posx, posy, true, true, true); // Change to a green tile
-            player.tar.addEq(dir.scale(3 * 16)); return;
+            player.scout.addEq(dir.scale(3 * 16)); return;
         }
         if (type === TILE.YELLOW) { // Yellow tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
