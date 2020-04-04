@@ -81,6 +81,12 @@ var player = new (class extends TransitObj {
             up:   true, down:  true,
             left: true, right: true
         };
+        this.scout = new Vec2(); // Scouting position
+        // this.currDisp = 0;
+        // this.moveDisp = 0;
+        // this.displayMoves = false;
+        // this.prevMoves = "";
+        // this.currMoves = "";
     }
 
     moveDirection (dir) {
@@ -169,7 +175,7 @@ var player = new (class extends TransitObj {
             Drawer.op = op;
             Drawer.setColor("#000")
                 .drawRect(false, 256 - 16, 0, 16, 256, 0.5);
-            let i = this.prevMoves.length > 17 ? 16 : 
+            let i = this.prevMoves.length > 17 ? 16 :
                 (this.prevMoves.length - 1);
             for (; i > 0; i -= 1) {
                 if (MD + i + 1 === this.prevMoves.length) {
@@ -182,7 +188,7 @@ var player = new (class extends TransitObj {
                 } else {
                     Drawer.op = op;
                 }
-                Drawer.customTriangle(false, this.prevMoves[MD + i],
+                Drawer.directionTriangle(false, this.prevMoves[MD + i],
                     256 - 8, 8 + 16 * i - 16 * (this.currDisp % 1), 10);
             }
             if (MD === 0) { Drawer.color = "#EE0"; }
