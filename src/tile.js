@@ -52,7 +52,7 @@ var tiles = new (class {
         return bx + this.maxX * by;
     }
 
-    setTile (type, x, y, doUndo = true, doDivide = true) {
+    setTile (type, x, y, doUndo = true, doDivide = true, doScout = false) {
         // Calculate the tile x and y grid positions
         let bx, by, ind;
         if (doDivide) {
@@ -70,7 +70,11 @@ var tiles = new (class {
         this.type[ind] = type;
         // Handle storing this tile update
         if (doUndo) {
-            UndoHandler.addTileUpdate(prevType, ind);
+            if (doScout) {
+                UndoHandler.addScoutUpdate(prevType, bx, by);
+            } else {
+                UndoHandler.addTileUpdate(prevType, ind);
+            }
         }
         // Handle updating the total number of tiles
         const staticTiles = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
@@ -264,6 +268,61 @@ class Tile {
         }
         throw new Error("Invalid Tile Type");
     }
+    
+    static onStepScout(type, dir) {
+        let posx = player.scout.x,
+            posy = player.scout.y;
+        posx -= posx % 16; posy -= posy % 16;
+        player.lastStep = type;
+        // Nothing for type < 0 (no Tile)
+        if (type === TILE.BLUE) { // Blue tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.RED) { // Red tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(2 * 16)); return;
+        } else if (type === TILE.GREEN) { // Green tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(3 * 16)); return;
+        }
+        // Nothing for Purple tiles (ends the level)
+        if (type === TILE.ORANGE) { // Orange Tile
+            tiles.setTile(TILE.BLUE, posx, posy, true, true, true); // Change to Blue tile
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.STEEL) { // Steel tile (never breaks)
+            UndoHandler.addScoutUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
+            return;
+        } else if (type === TILE.DOUBLE_RED) { // Double Red
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
+            return;
+        } else if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
+            tiles.setTile(TILE.ORANGE, posx, posy, true, true, true); // Change to an orange tile
+            player.scout.addEq(dir.scale(16)); return;
+        }
+        if (type === TILE.ORANGE_RED) { // Orange Red
+            tiles.setTile(TILE.RED, posx, posy, true, true, true); // Change to a red tile
+            player.scout.addEq(dir.scale(2 * 16)); return;
+        }
+        if (type === TILE.ORANGE_GREEN) { // Orange Green
+            tiles.setTile(TILE.GREEN, posx, posy, true, true, true); // Change to a green tile
+            player.tar.addEq(dir.scale(3 * 16)); return;
+        }
+        if (type === TILE.YELLOW) { // Yellow tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            if (dir.x !== 0) {
+                player.scout.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
+            } else {
+                player.scout.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0) + 8;
+            }
+            return;
+        }
+        throw new Error("Invalid Tile Type");
+    }
 
     // Return how many spaces we can move
     static onLand(type, dir) {
@@ -303,5 +362,30 @@ class Tile {
             return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
         return TILE_TRAVEL_TBL[type];
+    }
+    
+    // Return whether we landed on a valid space
+    static onLandScout(type, dir) {
+        let posx = player.scout.x,
+            posy = player.scout.y;
+        posx -= posx % 16; posy -= posy % 16;
+        if (type <= TILE.NULL) {
+            return false;
+        } else if (type === TILE.PURPLE) { // Purple tile (ends level)
+            return tiles.checkEnding();
+        } else if (type === TILE.ICE_BLUE) {
+            Tile.onStepScout(TILE.BLUE, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE) {
+            Tile.onStepScout(player.lastStep, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE_RED) {
+            Tile.onStepScout(TILE.RED, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE_GREEN) {
+            Tile.onStepScout(TILE.GREEN, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        }
+        return true;
     }
 }
