@@ -78,25 +78,25 @@ var player = new (class extends TransitObj {
         super(x, y);
         this.canMove = true;
         this.isValid = {
-            w: true, a: true,
-            s: true, d: true
+            up:   true, down:  true,
+            left: true, right: true
         };
     }
 
     moveDirection (dir) {
         if (dir.x === 0) {
             if (dir.y === -1) {
-                if (!this.isValid.w) { return false; }
+                if (!this.isValid.up) { return false; }
                 //this.currMoves += "w";
             } else if (dir.y === 1) {
-                if (!this.isValid.s) { return false; }
+                if (!this.isValid.down) { return false; }
                 //this.currMoves += "s";
             }
         } else if (dir.x === -1) {
-            if (!this.isValid.a) { return false; }
+            if (!this.isValid.left) { return false; }
             //player.currMoves += "a";
         } else if (dir.x === 1) {
-            if (!this.isValid.d) { return false; }
+            if (!this.isValid.right) { return false; }
            //player.currMoves += "d";
         }
         UndoHandler.startMove();
@@ -110,6 +110,30 @@ var player = new (class extends TransitObj {
                 moveTo.getVel());
         }
     }
+    
+    /*handlePreviousMoves() {
+        if (this.displayMoves) {
+            if (key.isBuffered(KEY.DISP_UP)) {
+                key.useBuffer(KEY.DISP_UP);
+                if (this.moveDisp > 0) {
+                    this.moveDisp -= 1;
+                }
+            } else if (key.isBuffered(KEY.DISP_DOWN)) {
+                key.useBuffer(KEY.DISP_DOWN);
+                if (this.prevMoves.length > 16 && 
+                        this.prevMoves.length - this.moveDisp > 16) {
+                    this.moveDisp += 1;
+                }
+            }
+        } else {
+            key.useBuffer(KEY.DISP_UP, KEY.DISP_DOWN);
+            this.moveDisp = 0;
+        }
+        if (key.isBuffered(KEY.DISP)) {
+            key.useBuffer(KEY.DISP);
+            this.displayMoves = !this.displayMoves;
+        }
+    }*/
     
     die () {
         this.canMove = false;
@@ -126,4 +150,46 @@ var player = new (class extends TransitObj {
         Drawer.setLineWidth(3).setColor("yellow")
         Drawer.drawCirc(true, this.pos, 7);
     }
+    
+    /*drawPreviousMoves (op = 1, dt = 0) {
+        if (this.displayMoves) {
+            const DEL = dt * Math.ceil(Math.abs(this.currDisp - this.moveDisp)) / 256;
+            if (this.currDisp + DEL < this.moveDisp) {
+                this.currDisp += DEL;
+            } else if (this.currDisp < this.moveDisp) {
+                this.currDisp = this.moveDisp;
+            }
+            if (this.currDisp - DEL > this.moveDisp) {
+                this.currDisp -= DEL;
+            } else if (this.currDisp > this.moveDisp) {
+                this.currDisp = this.moveDisp;
+            }
+            
+            let temp = Drawer.op, MD = this.currDisp | 0;
+            Drawer.op = op;
+            Drawer.setColor("#000")
+                .drawRect(false, 256 - 16, 0, 16, 256, 0.5);
+            let i = this.prevMoves.length > 17 ? 16 : 
+                (this.prevMoves.length - 1);
+            for (; i > 0; i -= 1) {
+                if (MD + i + 1 === this.prevMoves.length) {
+                    Drawer.color = "#E00";
+                } else {
+                    Drawer.color = "#FFF";
+                }
+                if (i === 16) {
+                    Drawer.op = op * (this.currDisp % 1);
+                } else {
+                    Drawer.op = op;
+                }
+                Drawer.customTriangle(false, this.prevMoves[MD + i],
+                    256 - 8, 8 + 16 * i - 16 * (this.currDisp % 1), 10);
+            }
+            if (MD === 0) { Drawer.color = "#EE0"; }
+            Drawer.op = op * (1 - (this.currDisp % 1));
+            Drawer.customTriangle(false, this.prevMoves[MD],
+                256 - 8, 8 - 16 * (this.currDisp % 1), 10);
+            Drawer.op = temp;
+        }
+    }*/
 })(-8, -8);
