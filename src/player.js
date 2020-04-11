@@ -77,9 +77,9 @@ var player = new (class extends TransitObj {
     constructor (x = 0, y = 0) {
         super(x, y);
         this.canMove = true;
-        this.isValid = {
-            up:   true, down:  true,
-            left: true, right: true
+        this.scoutResult = {
+            up:   SCOUT_CODE.VALID, down:  SCOUT_CODE.VALID,
+            left: SCOUT_CODE.VALID, right: SCOUT_CODE.VALID
         };
         this.scout = new Vec2(); // Scouting position
         // this.currDisp = 0;
@@ -92,17 +92,17 @@ var player = new (class extends TransitObj {
     moveDirection (dir) {
         if (dir.x === 0) {
             if (dir.y === -1) {
-                if (!this.isValid.up) { return false; }
+                if (this.scoutResult.up === SCOUT_CODE.INVALID) { return false; }
                 //this.currMoves += "w";
             } else if (dir.y === 1) {
-                if (!this.isValid.down) { return false; }
+                if (this.scoutResult.down === SCOUT_CODE.INVALID) { return false; }
                 //this.currMoves += "s";
             }
         } else if (dir.x === -1) {
-            if (!this.isValid.left) { return false; }
+            if (this.scoutResult.left === SCOUT_CODE.INVALID) { return false; }
             //player.currMoves += "a";
         } else if (dir.x === 1) {
-            if (!this.isValid.right) { return false; }
+            if (this.scoutResult.right === SCOUT_CODE.INVALID) { return false; }
            //player.currMoves += "d";
         }
         UndoHandler.startMove();
@@ -113,11 +113,11 @@ var player = new (class extends TransitObj {
     scoutAllMoves () {
     	let dir = new Vec2();
         UndoHandler.startScout();
-        dir.y = -1; this.isValid.up    = this.scoutMove(dir);
-        dir.y =  1; this.isValid.down  = this.scoutMove(dir);
+        dir.y = -1; this.scoutResult.up    = this.scoutMove(dir);
+        dir.y =  1; this.scoutResult.down  = this.scoutMove(dir);
         dir.y =  0;
-        dir.x = -1; this.isValid.left  = this.scoutMove(dir);
-        dir.x =  1; this.isValid.right = this.scoutMove(dir);
+        dir.x = -1; this.scoutResult.left  = this.scoutMove(dir);
+        dir.x =  1; this.scoutResult.right = this.scoutMove(dir);
     }
     
     scoutMove (dir) {
