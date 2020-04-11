@@ -1,13 +1,5 @@
-var COLOR = {
-    BLUE:   "#00E",
-    RED:    "#E00",
-    GREEN:  "#0E0",
-    PURPLE: "#A0A",
-    ORANGE: "#E70",
-    STEEL:  "#AAA",
-    YELLOW: "#EE0",
-    ICE:    "#4EE"
-};
+////////////////////////////////////////////////////////////////////////////////
+// Enumerated constants
 var TILE = {
     NULL:         -1,
     BLUE:          0,
@@ -41,7 +33,35 @@ var TILE_ANIM = {
     YELLOW:       11,
     ICE:          13
 };
+var MOVES_PHASE = {
+    FADE_IN:  0,
+    MOVE:     1,
+    STAY:     2,
+    SPLIT:    3,
+    FADE_OUT: 4,
+    DELETE:   5
+};
+var MOVES = {
+    WHITE: 0,
+    RED:   1,
+    GOLD:  2
+};
 
+////////////////////////////////////////////////////////////////////////////////
+// Named constants
+var COLOR = {
+    WHITE:  "#EEE",
+    GOLD:   "#EB0",
+    
+    BLUE:   "#00E",
+    RED:    "#E00",
+    GREEN:  "#0E0",
+    PURPLE: "#A0A",
+    ORANGE: "#E70",
+    STEEL:  "#AAA",
+    YELLOW: "#EE0",
+    ICE:    "#4EE"
+};
 var KEY = {
     UP:   "w", DOWN:  "s",
     LEFT: "a", RIGHT: "d",
@@ -51,6 +71,10 @@ var KEY = {
     // DISP_DOWN: "i"
 };
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Tables
 var TILE_COLOR = { OUTER_TBL: [], INNER_TBL: [] };
 
 TILE_COLOR.OUTER_TBL[TILE.BLUE]   = COLOR.BLUE;
@@ -88,6 +112,11 @@ TILE_COLOR.INNER_TBL[TILE.ICE]       = null;
 TILE_COLOR.INNER_TBL[TILE.ICE_RED]   = COLOR.RED;
 TILE_COLOR.INNER_TBL[TILE.ICE_GREEN] = COLOR.GREEN;
 TILE_COLOR.INNER_TBL[TILE.WALL]      = COLOR.STEEL;
+
+var MOVES_COLOR = [];
+MOVES_COLOR[MOVES.WHITE] = COLOR.WHITE;
+MOVES_COLOR[MOVES.RED]   = COLOR.RED;
+MOVES_COLOR[MOVES.GOLD]  = COLOR.GOLD;
 
 var TILE_TRAVEL_TBL = [];
 TILE_TRAVEL_TBL[TILE.BLUE]   = 1;
