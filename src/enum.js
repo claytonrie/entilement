@@ -47,6 +47,12 @@ var MOVES = {
     GOLD:  2
 };
 
+var SCOUT_CODE = {
+    INVALID: 0,
+    VALID:   1,
+    END:     2
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Named constants
 var COLOR = {
