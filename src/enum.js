@@ -42,8 +42,8 @@ var MOVES_PHASE = {
     DELETE:   5
 };
 var MOVES = {
-    WHITE: 0,
-    RED:   1,
+    RED:   0,
+    WHITE: 1,
     GOLD:  2
 };
 
