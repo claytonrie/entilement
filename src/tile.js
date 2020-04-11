@@ -365,10 +365,10 @@ class Tile {
         let posx = player.scout.x,
             posy = player.scout.y;
         posx -= posx % 16; posy -= posy % 16;
-        if (type <= TILE.NULL) {
-            return false;
+        if (type <= TILE.NULL || type === TILE.WALL) {
+            return SCOUT_CODE.INVALID;
         } else if (type === TILE.PURPLE) { // Purple tile (ends level)
-            return tiles.checkEnding();
+            return tiles.checkEnding() ? SCOUT_CODE.END : SCOUT_CODE.INVALID;
         } else if (type === TILE.ICE_BLUE) {
             Tile.onStepScout(TILE.BLUE, dir);
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
@@ -382,6 +382,6 @@ class Tile {
             Tile.onStepScout(TILE.GREEN, dir);
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         }
-        return true;
+        return SCOUT_CODE.VALID;
     }
 }
