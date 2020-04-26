@@ -297,9 +297,9 @@ class Tile {
             }
             return true;
         }
-        // TODO: add in "onOver" function
+        let ret = Tile.onOver(direction, scale);
         player.scout.addEq(direction.scale(16 * scale));
-        return true;
+        return ret;
     }
 
     // Return how many spaces we can move
@@ -365,5 +365,19 @@ class Tile {
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         }
         return SCOUT_CODE.VALID;
+    }
+    
+    // Return true if we can pass over this direction
+    static onOver(dir, scale) {
+        if (scale < 2) {
+            return true;
+        }
+        let i = 1;
+        for (; i < scale; i += 1) {
+            let type = tiles.getTile(player.scout.x + 16 * i * dir.x,
+                    player.scout.y + 16 * i * dir.y);
+            if (type == TILE.WALL) { return false; }
+        }
+        return true;
     }
 }
