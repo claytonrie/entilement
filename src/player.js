@@ -77,6 +77,7 @@ var player = new (class extends TransitObj {
     constructor (x = 0, y = 0) {
         super(x, y);
         this.canMove = true;
+        this.onDiagonal = false;
         this.scoutResult = {
             up:   SCOUT_CODE.VALID, down:  SCOUT_CODE.VALID,
             left: SCOUT_CODE.VALID, right: SCOUT_CODE.VALID
