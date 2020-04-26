@@ -184,78 +184,53 @@ class Tile {
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
+        
+        let direction = dir, scale = 0;
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) { // Blue tile
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.BLUE, posx, posy);
-            player.tar.addEq(dir.scale(16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.RED) { // Red tile
+            scale = 1;
+        } else if (type === TILE.RED) { // Red tile
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.RED, posx, posy);
-            player.tar.addEq(dir.scale(2 * 16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.GREEN) { // Green tile
+            scale = 2;
+        } else if (type === TILE.GREEN) { // Green tile
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.GREEN, posx, posy);
-            player.tar.addEq(dir.scale(3 * 16));
-            player.resetTransition();
-            return;
+            scale = 3;
         }
         // Nothing for Purple tiles (ends the level)
-        if (type === TILE.ORANGE) { // Orange Tile
+        else if (type === TILE.ORANGE) { // Orange Tile
             tiles.setTile(TILE.BLUE, posx, posy); // Change to Blue tile
             new TileAnimation(TILE_ANIM.ORANGE, posx, posy);
-            player.tar.addEq(dir.scale(16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.STEEL) { // Steel tile (never breaks)
+            scale = 1;
+        } else if (type === TILE.STEEL) { // Steel tile (never breaks)
             UndoHandler.addTileUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
-            player.tar.addEq(dir.scale(16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
+            scale = 1;
+        } else if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.DOUBLE_BLUE, posx, posy);
-            player.tar.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.DOUBLE_RED) { // Double Red
+            direction.addEq(dir.perp());
+            scale = 1;
+        } else if (type === TILE.DOUBLE_RED) { // Double Red
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.DOUBLE_RED, posx, posy);
-            player.tar.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
+            direction.addEq(dir.perp());
+            scale = 2;
+        } else if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
             tiles.setTile(TILE.ORANGE, posx, posy); // Change to an orange tile
             new TileAnimation(TILE_ANIM.DOUBLE_ORANGE, posx, posy);
-            player.tar.addEq(dir.scale(16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.ORANGE_RED) { // Orange Red
+            scale = 1;
+        } else if (type === TILE.ORANGE_RED) { // Orange Red
             tiles.setTile(TILE.RED, posx, posy); // Change to a red tile
             new TileAnimation(TILE_ANIM.ORANGE_RED, posx, posy);
-            player.tar.addEq(dir.scale(2 * 16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.ORANGE_GREEN) { // Orange Green
+            scale = 2;
+        } else if (type === TILE.ORANGE_GREEN) { // Orange Green
             tiles.setTile(TILE.GREEN, posx, posy); // Change to a green tile
             new TileAnimation(TILE_ANIM.ORANGE_GREEN, posx, posy);
-            player.tar.addEq(dir.scale(3 * 16));
-            player.resetTransition();
-            return;
-        }
-        if (type === TILE.YELLOW) { // Yellow tile
+            scale = 3;
+        } else if (type === TILE.YELLOW) { // Yellow tile
             tiles.setTile(TILE.NULL, posx, posy);
             new TileAnimation(TILE_ANIM.YELLOW, posx, posy);
             if (dir.x !== 0) {
@@ -266,7 +241,8 @@ class Tile {
             player.resetTransition();
             return;
         }
-        throw new Error("Invalid Tile Type");
+        player.tar.addEq(direction.scale(16 * scale));
+        player.resetTransition();
     }
     
     static onStepScout(type, dir) {
@@ -274,50 +250,56 @@ class Tile {
             posy = player.scout.y;
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
+        
+        let direction = dir, scale = 0;
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) { // Blue tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
-            player.scout.addEq(dir.scale(16)); return;
+            scale = 1;
         } else if (type === TILE.RED) { // Red tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
-            player.scout.addEq(dir.scale(2 * 16)); return;
+            scale = 2;
         } else if (type === TILE.GREEN) { // Green tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
-            player.scout.addEq(dir.scale(3 * 16)); return;
+            scale = 3;
         }
         // Nothing for Purple tiles (ends the level)
-        if (type === TILE.ORANGE) { // Orange Tile
+        else if (type === TILE.ORANGE) { // Orange Tile
             tiles.setTile(TILE.BLUE, posx, posy, true, true, true); // Change to Blue tile
-            player.scout.addEq(dir.scale(16)); return;
+            scale = 1;
         } else if (type === TILE.STEEL) { // Steel tile (never breaks)
             UndoHandler.addScoutUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
-            player.scout.addEq(dir.scale(16)); return;
+            scale = 1;
         } else if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
-            player.scout.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
-            return;
+            direction.addEq(dir.perp());
+            scale = 1;
         } else if (type === TILE.DOUBLE_RED) { // Double Red
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
-            player.scout.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
-            return;
+            direction.addEq(dir.perp());
+            scale = 1;
         } else if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
             tiles.setTile(TILE.ORANGE, posx, posy, true, true, true); // Change to an orange tile
-            player.scout.addEq(dir.scale(16)); return;
+            scale = 1;
         } else if (type === TILE.ORANGE_RED) { // Orange Red
             tiles.setTile(TILE.RED, posx, posy, true, true, true); // Change to a red tile
-            player.scout.addEq(dir.scale(2 * 16)); return;
+            scale = 2;
         } else if (type === TILE.ORANGE_GREEN) { // Orange Green
             tiles.setTile(TILE.GREEN, posx, posy, true, true, true); // Change to a green tile
-            player.scout.addEq(dir.scale(3 * 16)); return;
+            scale = 3;
         } else if (type === TILE.YELLOW) { // Yellow tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            // "onOver" is unneeded here
             if (dir.x !== 0) {
                 player.scout.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
             } else {
                 player.scout.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0) + 8;
             }
-            return;
+            return true;
         }
+        // TODO: add in "onOver" function
+        player.scout.addEq(direction.scale(16 * scale));
+        return true;
     }
 
     // Return how many spaces we can move
