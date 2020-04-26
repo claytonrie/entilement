@@ -192,4 +192,28 @@ var Drawer = new (class {
         }
         return this;
     }
+    
+    directionTriangle (stroke, dir, xc, yc, sz, op) {
+    	if (dir === "w") {
+        	this.path().moveTo(xc, yc - sz / 2)
+            	.lineTo(xc + sz / 2, yc + sz / 2)
+            	.lineTo(xc - sz / 2, yc + sz / 2)
+            	.lineTo(xc, yc - sz / 2).draw(stroke, op);
+        } else if (dir === "s") {
+        	this.path().moveTo(xc, yc + sz / 2)
+            	.lineTo(xc + sz / 2, yc - sz / 2)
+            	.lineTo(xc - sz / 2, yc - sz / 2)
+            	.lineTo(xc, yc + sz / 2).draw(stroke, op);
+        } else if (dir === "a") {
+        	this.path().moveTo(xc - sz / 2, yc)
+            	.lineTo(xc + sz / 2, yc + sz / 2)
+            	.lineTo(xc + sz / 2, yc - sz / 2)
+            	.lineTo(xc - sz / 2, yc).draw(stroke, op);
+        } else if (dir === "d") {
+        	this.path().moveTo(xc + sz / 2, yc)
+            	.lineTo(xc - sz / 2, yc + sz / 2)
+            	.lineTo(xc - sz / 2, yc - sz / 2)
+            	.lineTo(xc + sz / 2, yc).draw(stroke, op);
+        }
+    }
 })(256, 2);

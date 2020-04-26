@@ -76,10 +76,83 @@ class TransitObj {
 var player = new (class extends TransitObj {
     constructor (x = 0, y = 0) {
         super(x, y);
+        this.canMove = true;
+        this.scoutResult = {
+            up:   SCOUT_CODE.VALID, down:  SCOUT_CODE.VALID,
+            left: SCOUT_CODE.VALID, right: SCOUT_CODE.VALID
+        };
+        this.scout = new Vec2(); // Scouting position
+        // this.currDisp = 0;
+        // this.moveDisp = 0;
+        // this.displayMoves = false;
+        // this.prevMoves = "";
+        // this.currMoves = "";
     }
 
+    moveDirection (dir) {
+        if (dir.x === 0) {
+            if (dir.y === -1) {
+                if (this.scoutResult.up === SCOUT_CODE.INVALID) { return false; }
+                //this.currMoves += "w";
+            } else if (dir.y === 1) {
+                if (this.scoutResult.down === SCOUT_CODE.INVALID) { return false; }
+                //this.currMoves += "s";
+            }
+        } else if (dir.x === -1) {
+            if (this.scoutResult.left === SCOUT_CODE.INVALID) { return false; }
+            //player.currMoves += "a";
+        } else if (dir.x === 1) {
+            if (this.scoutResult.right === SCOUT_CODE.INVALID) { return false; }
+           //player.currMoves += "d";
+        }
+        UndoHandler.startMove();
+        Tile.onStep(tiles.getTile(this.tar.x, this.tar.y), dir);
+        return Tile.onLand(tiles.getTile(this.tar.x, this.tar.y), dir);
+    }
+    
+    scoutAllMoves () {
+    	let dir = new Vec2();
+        UndoHandler.startScout();
+        dir.y = -1; this.scoutResult.up    = this.scoutMove(dir);
+        dir.y =  1; this.scoutResult.down  = this.scoutMove(dir);
+        dir.y =  0;
+        dir.x = -1; this.scoutResult.left  = this.scoutMove(dir);
+        dir.x =  1; this.scoutResult.right = this.scoutMove(dir);
+    }
+    
+    scoutMove (dir) {
+        Tile.onStepScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        let ret =  Tile.onLandScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        UndoHandler.undoScout();
+        return ret;
+    }
+    
+    /*handlePreviousMoves() {
+        if (this.displayMoves) {
+            if (key.isBuffered(KEY.DISP_UP)) {
+                key.useBuffer(KEY.DISP_UP);
+                if (this.moveDisp > 0) {
+                    this.moveDisp -= 1;
+                }
+            } else if (key.isBuffered(KEY.DISP_DOWN)) {
+                key.useBuffer(KEY.DISP_DOWN);
+                if (this.prevMoves.length > 16 && 
+                        this.prevMoves.length - this.moveDisp > 16) {
+                    this.moveDisp += 1;
+                }
+            }
+        } else {
+            key.useBuffer(KEY.DISP_UP, KEY.DISP_DOWN);
+            this.moveDisp = 0;
+        }
+        if (key.isBuffered(KEY.DISP)) {
+            key.useBuffer(KEY.DISP);
+            this.displayMoves = !this.displayMoves;
+        }
+    }*/
+    
     die () {
-        Game.mode = 3;
+        this.canMove = false;
     }
 
     draw () {
@@ -93,4 +166,46 @@ var player = new (class extends TransitObj {
         Drawer.setLineWidth(3).setColor("yellow")
         Drawer.drawCirc(true, this.pos, 7);
     }
+    
+    /*drawPreviousMoves (op = 1, dt = 0) {
+        if (this.displayMoves) {
+            const DEL = dt * Math.ceil(Math.abs(this.currDisp - this.moveDisp)) / 256;
+            if (this.currDisp + DEL < this.moveDisp) {
+                this.currDisp += DEL;
+            } else if (this.currDisp < this.moveDisp) {
+                this.currDisp = this.moveDisp;
+            }
+            if (this.currDisp - DEL > this.moveDisp) {
+                this.currDisp -= DEL;
+            } else if (this.currDisp > this.moveDisp) {
+                this.currDisp = this.moveDisp;
+            }
+            
+            let temp = Drawer.op, MD = this.currDisp | 0;
+            Drawer.op = op;
+            Drawer.setColor("#000")
+                .drawRect(false, 256 - 16, 0, 16, 256, 0.5);
+            let i = this.prevMoves.length > 17 ? 16 :
+                (this.prevMoves.length - 1);
+            for (; i > 0; i -= 1) {
+                if (MD + i + 1 === this.prevMoves.length) {
+                    Drawer.color = "#E00";
+                } else {
+                    Drawer.color = "#FFF";
+                }
+                if (i === 16) {
+                    Drawer.op = op * (this.currDisp % 1);
+                } else {
+                    Drawer.op = op;
+                }
+                Drawer.directionTriangle(false, this.prevMoves[MD + i],
+                    256 - 8, 8 + 16 * i - 16 * (this.currDisp % 1), 10);
+            }
+            if (MD === 0) { Drawer.color = "#EE0"; }
+            Drawer.op = op * (1 - (this.currDisp % 1));
+            Drawer.customTriangle(false, this.prevMoves[MD],
+                256 - 8, 8 - 16 * (this.currDisp % 1), 10);
+            Drawer.op = temp;
+        }
+    }*/
 })(-8, -8);

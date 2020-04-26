@@ -66,7 +66,7 @@ TileAnimation.animate[TILE_ANIM.ORANGE] = function (dt, ind) {
     let op = 1 - (tiles.atime[ind] / 512);
     Drawer.lineWidth = 3;
     if (op <= 0) { return true; }
-    Drawer.setLineWidth(3).setColor(Tile.outerColorTable[4]);
+    Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE]);
     Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
     return false;
 };
@@ -79,25 +79,25 @@ TileAnimation.animate[TILE_ANIM.DOUBLE_RED] = function (dt, ind) {
 TileAnimation.animate[TILE_ANIM.DOUBLE_ORANGE] = function (dt, ind) {
     let op = 1 - (tiles.atime[ind] / 512);
     if (op <= 0) { return true; }
-    Drawer.color = Tile.innerColorTable[8];
+    Drawer.color = TILE_COLOR.INNER_TBL[TILE.DOUBLE_ORANGE];
     Drawer.drawRect(false, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75 * op);
     return false;
 };
 TileAnimation.animate[TILE_ANIM.ORANGE_RED] = function (dt, ind) {
     let op = 1 - (tiles.atime[ind] / 512);
     if (op <= 0) { return true; }
-    Drawer.setLineWidth(5 * op + 3).setColor(Tile.innerColorTable[9]);
+    Drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_RED]);
     Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
-    Drawer.setLineWidth(3).setColor(Tile.outerColorTable[9]);
+    Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_RED]);
     Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
     return false;
 };
 TileAnimation.animate[TILE_ANIM.ORANGE_GREEN] = function (dt, ind) {
     let op = 1 - (tiles.atime[ind] / 512);
     if (op <= 0) { return true; }
-    Drawer.setLineWidth(5 * op + 3).setColor(Tile.innerColorTable[10]);
+    Drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_GREEN]);
     Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
-    Drawer.setLineWidth(3).setColor(Tile.outerColorTable[10]);
+    Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_GREEN]);
     Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
     return false;
 };
@@ -108,7 +108,7 @@ TileAnimation.animate[TILE_ANIM.ICE] = function (dt, ind) {
     let op = 1 - (tiles.atime[ind] / 512) / 2,
         pos = 8 * tiles.atime[ind] / 512 / 2;
     if (op <= 0) { return true; }
-    Drawer.setColor(Tile.outerColorTable[13]);
+    Drawer.setColor(TILE_COLOR.OUTER_TBL[TILE.ICE]);
     let rand1 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 0, 2) - 1,
         rand2 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 1, 2) - 1,
         rand3 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 2, 2) - 1,

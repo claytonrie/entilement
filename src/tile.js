@@ -22,36 +22,83 @@ var tiles = new (class {
         this.alength = 0;
     }
 
-    getTile (x, y) {
+    getTile (x, y, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return TILE.NULL;
+        }
         return this.type[bx + this.maxX * by];
     }
-
-    setTile (type, x, y) {
+    
+    getIndex (x, y, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
-        let didExist = this.type[bx + this.maxX * by] > TILE.NULL;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return -1;
+        }
+        return bx + this.maxX * by;
+    }
+
+    setTile (type, x, y, doUndo = true, doDivide = true, doScout = false) {
+        // Calculate the tile x and y grid positions
+        let bx, by, ind;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
+        if (bx < 0 || by < 0 || bx >= tiles.maxX || by >= tiles.maxY) {
+            return false;
+        }
+        ind = bx + this.maxX * by;
+        let prevType = this.type[ind];
         // Change the type
-        this.type[bx + this.maxX * by] = type;
-        
+        this.type[ind] = type;
+        // Handle storing this tile update
+        if (doUndo) {
+            if (doScout) {
+                UndoHandler.addScoutUpdate(prevType, bx, by);
+            } else {
+                UndoHandler.addTileUpdate(prevType, ind);
+            }
+        }
         // Handle updating the total number of tiles
         const staticTiles = [TILE.PURPLE, TILE.STEEL, TILE.WALL];
-        if (!didExist && (type > TILE.NULL)) {
+        if ((prevType <= TILE.NULL) && (type > TILE.NULL)) {
             // If the tile can't disappear, don't add it to the count
             if (!staticTiles.includes(type)) {
                 this.count += 1;
             }
             return true;
-        } else if (didExist && (type <= TILE.NULL)) {
+        } else if ((prevType > TILE.NULL) && (type <= TILE.NULL)) {
             this.count -= 1;
         }
         return false;
     }
 
-    searchHorz(x, y, backwards = false) {
+    searchHorz(x, y, backwards = false, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
         if (backwards) {
             for (; bx >= 0; bx -= 1) {
                 if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
@@ -63,9 +110,15 @@ var tiles = new (class {
         }
         return bx;
     }
-    searchVert(x, y, backwards = false) {
+    searchVert(x, y, backwards = false, doDivide = true) {
         // Calculate the tile x and y grid positions
-        let bx = (x / 16) | 0, by = (y / 16) | 0;
+        let bx, by;
+        if (doDivide) {
+            bx = (x / 16) | 0;
+            by = (y / 16) | 0;
+        } else {
+            bx = x | 0; by = y | 0;
+        }
         if (backwards) {
             for (; by >= 0; by -= 1) {
                 if (this.type[bx + this.maxX * by] > TILE.NULL) { break; }
@@ -118,11 +171,11 @@ class Tile {
     static draw(type, x, y) {
         let dx = x - (x % 16),
             dy = y - (y % 16);
-        if (Tile.innerColorTable[type] !== null) {
-            Drawer.color = Tile.innerColorTable[type];
+        if (TILE_COLOR.INNER_TBL[type] !== null) {
+            Drawer.color = TILE_COLOR.INNER_TBL[type];
             Drawer.drawRect(false, dx, dy, 16, 16, 0.75);
         }
-        Drawer.setLineWidth(3).setColor(Tile.outerColorTable[type]);
+        Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[type]);
         Drawer.drawRect(true, dx, dy, 16, 16);
     }
 
@@ -162,6 +215,7 @@ class Tile {
             return;
         }
         if (type === TILE.STEEL) { // Steel tile (never breaks)
+            UndoHandler.addTileUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
             player.tar.addEq(dir.scale(16));
             player.resetTransition();
             return;
@@ -214,13 +268,63 @@ class Tile {
         }
         throw new Error("Invalid Tile Type");
     }
+    
+    static onStepScout(type, dir) {
+        let posx = player.scout.x,
+            posy = player.scout.y;
+        posx -= posx % 16; posy -= posy % 16;
+        player.lastStep = type;
+        // Nothing for type < 0 (no Tile)
+        if (type === TILE.BLUE) { // Blue tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.RED) { // Red tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(2 * 16)); return;
+        } else if (type === TILE.GREEN) { // Green tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(dir.scale(3 * 16)); return;
+        }
+        // Nothing for Purple tiles (ends the level)
+        if (type === TILE.ORANGE) { // Orange Tile
+            tiles.setTile(TILE.BLUE, posx, posy, true, true, true); // Change to Blue tile
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.STEEL) { // Steel tile (never breaks)
+            UndoHandler.addScoutUpdate(TILE.STEEL, tiles.getIndex(posx, posy));
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.DOUBLE_BLUE) { // Double Blue (goes diagonal)
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(Vec2.scAddSc(16, dir, 16, dir.perp()));
+            return;
+        } else if (type === TILE.DOUBLE_RED) { // Double Red
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            player.scout.addEq(Vec2.scAddSc(2 * 16, dir, 2 * 16, dir.perp()));
+            return;
+        } else if (type === TILE.DOUBLE_ORANGE) { // Double Orange (takes 3 steps)
+            tiles.setTile(TILE.ORANGE, posx, posy, true, true, true); // Change to an orange tile
+            player.scout.addEq(dir.scale(16)); return;
+        } else if (type === TILE.ORANGE_RED) { // Orange Red
+            tiles.setTile(TILE.RED, posx, posy, true, true, true); // Change to a red tile
+            player.scout.addEq(dir.scale(2 * 16)); return;
+        } else if (type === TILE.ORANGE_GREEN) { // Orange Green
+            tiles.setTile(TILE.GREEN, posx, posy, true, true, true); // Change to a green tile
+            player.scout.addEq(dir.scale(3 * 16)); return;
+        } else if (type === TILE.YELLOW) { // Yellow tile
+            tiles.setTile(TILE.NULL, posx, posy, true, true, true);
+            if (dir.x !== 0) {
+                player.scout.x = 16 * tiles.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
+            } else {
+                player.scout.y = 16 * tiles.searchVert(posx, posy + dir.y * 16, dir.y < 0) + 8;
+            }
+            return;
+        }
+    }
 
     // Return how many spaces we can move
     static onLand(type, dir) {
         let posx = player.tar.x,
             posy = player.tar.y;
         posx -= posx % 16; posy -= posy % 16;
-        const LAND_TBL = [1, 2, 3, 0, 1, 1, -1, -2, 1, 2, 3, Infinity, 0, 0, 0];
         if (type <= TILE.NULL) {
             player.die();
             return 0;
@@ -253,43 +357,31 @@ class Tile {
             new TileAnimation(TILE_ANIM.ICE, posx, posy);
             return Tile.onLand(tiles.getTile(player.tar.x, player.tar.y), dir);
         }
-        return LAND_TBL[type];
+        return TILE_TRAVEL_TBL[type];
+    }
+    
+    // Return whether we landed on a valid space
+    static onLandScout(type, dir) {
+        let posx = player.scout.x,
+            posy = player.scout.y;
+        posx -= posx % 16; posy -= posy % 16;
+        if (type <= TILE.NULL || type === TILE.WALL) {
+            return SCOUT_CODE.INVALID;
+        } else if (type === TILE.PURPLE) { // Purple tile (ends level)
+            return tiles.checkEnding() ? SCOUT_CODE.END : SCOUT_CODE.INVALID;
+        } else if (type === TILE.ICE_BLUE) {
+            Tile.onStepScout(TILE.BLUE, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE) {
+            Tile.onStepScout(player.lastStep, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE_RED) {
+            Tile.onStepScout(TILE.RED, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        } else if (type === TILE.ICE_GREEN) {
+            Tile.onStepScout(TILE.GREEN, dir);
+            return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
+        }
+        return SCOUT_CODE.VALID;
     }
 }
-Tile.outerColorTable = [];
-Tile.outerColorTable[TILE.BLUE]          = COLOR.BLUE;
-Tile.outerColorTable[TILE.RED]           = COLOR.RED;
-Tile.outerColorTable[TILE.GREEN]         = COLOR.GREEN;
-Tile.outerColorTable[TILE.PURPLE]        = COLOR.PURPLE;
-Tile.outerColorTable[TILE.ORANGE]        = COLOR.ORANGE;
-Tile.outerColorTable[TILE.STEEL]         = COLOR.STEEL;
-Tile.outerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
-Tile.outerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
-Tile.outerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
-Tile.outerColorTable[TILE.ORANGE_RED]    = COLOR.ORANGE;
-Tile.outerColorTable[TILE.ORANGE_GREEN]  = COLOR.ORANGE;
-Tile.outerColorTable[TILE.YELLOW]        = COLOR.YELLOW;
-Tile.outerColorTable[TILE.ICE_BLUE]      = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE]           = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE_RED]       = COLOR.ICE;
-Tile.outerColorTable[TILE.ICE_GREEN]     = COLOR.ICE;
-Tile.outerColorTable[TILE.WALL]          = COLOR.STEEL;
-
-Tile.innerColorTable = [];
-Tile.innerColorTable[TILE.BLUE]          = null;
-Tile.innerColorTable[TILE.RED]           = null;
-Tile.innerColorTable[TILE.GREEN]         = null;
-Tile.innerColorTable[TILE.PURPLE]        = null;
-Tile.innerColorTable[TILE.ORANGE]        = null;
-Tile.innerColorTable[TILE.STEEL]         = null;
-Tile.innerColorTable[TILE.DOUBLE_BLUE]   = COLOR.BLUE;
-Tile.innerColorTable[TILE.DOUBLE_RED]    = COLOR.RED;
-Tile.innerColorTable[TILE.DOUBLE_ORANGE] = COLOR.ORANGE;
-Tile.innerColorTable[TILE.ORANGE_RED]    = COLOR.RED;
-Tile.innerColorTable[TILE.ORANGE_GREEN]  = COLOR.GREEN;
-Tile.innerColorTable[TILE.YELLOW]        = null;
-Tile.innerColorTable[TILE.ICE_BLUE]      = COLOR.BLUE;
-Tile.innerColorTable[TILE.ICE]           = null;
-Tile.innerColorTable[TILE.ICE_RED]       = COLOR.RED;
-Tile.innerColorTable[TILE.ICE_GREEN]     = COLOR.GREEN;
-Tile.innerColorTable[TILE.WALL]          = COLOR.STEEL;
