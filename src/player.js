@@ -108,7 +108,10 @@ var player = new (class extends TransitObj {
         }
         UndoHandler.startMove();
         Tile.onStep(tiles.getTile(this.tar.x, this.tar.y), dir);
-        return Tile.onLand(tiles.getTile(this.tar.x, this.tar.y), dir);
+        let ret = Tile.onLand(tiles.getTile(this.tar.x, this.tar.y), dir);
+        if (ret < 0) { this.onDiagonal = true; }
+        else { this.onDiagonal = false; }
+        return ret
     }
     
     scoutAllMoves () {
