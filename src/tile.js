@@ -152,22 +152,6 @@ var tiles = new (class {
 })(16, 16);
 
 class Tile {
-    constructor (type, x, y, divide = true) {
-        let bx, by;
-        // Position divided by 16
-        if (divide) {
-            bx = (x / 16) | 0; by = (y / 16) | 0;
-        } else {
-            bx = x | 0; by = y | 0;
-        }
-        if (bx > tiles.maxX || by > tiles.maxY) {
-            throw new Error(`Tile out of bounds at position (${bx}, ${by})`);
-        }
-        tiles.type[bx + tiles.maxX * by] = type;
-        tiles.count += 1;
-        return true;
-    }
-
     static draw(type, x, y) {
         let dx = x - (x % 16),
             dy = y - (y % 16);
@@ -352,16 +336,20 @@ class Tile {
         } else if (type === TILE.PURPLE) { // Purple tile (ends level)
             return tiles.checkEnding() ? SCOUT_CODE.END : SCOUT_CODE.INVALID;
         } else if (type === TILE.ICE_BLUE) {
-            Tile.onStepScout(TILE.BLUE, dir);
+            let isValid = Tile.onStepScout(TILE.BLUE, dir);
+            if (!isValid) return SCOUT_CODE.INVALID;
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         } else if (type === TILE.ICE) {
-            Tile.onStepScout(player.lastStep, dir);
+            let isValid = Tile.onStepScout(player.lastStep, dir);
+            if (!isValid) return SCOUT_CODE.INVALID;
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         } else if (type === TILE.ICE_RED) {
-            Tile.onStepScout(TILE.RED, dir);
+            let isValid = Tile.onStepScout(TILE.RED, dir);
+            if (!isValid) return SCOUT_CODE.INVALID;
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         } else if (type === TILE.ICE_GREEN) {
-            Tile.onStepScout(TILE.GREEN, dir);
+            let isValid = Tile.onStepScout(TILE.GREEN, dir);
+            if (!isValid) return SCOUT_CODE.INVALID;
             return Tile.onLandScout(tiles.getTile(player.scout.x, player.scout.y), dir);
         }
         return SCOUT_CODE.VALID;
