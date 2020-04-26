@@ -185,7 +185,7 @@ class Tile {
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
         
-        let direction = dir, scale = 0;
+        let direction = new Vec2(dir.x, dir.y), scale = 0;
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) { // Blue tile
             tiles.setTile(TILE.NULL, posx, posy);
@@ -251,7 +251,7 @@ class Tile {
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
         
-        let direction = dir, scale = 0;
+        let direction = new Vec2(dir.x, dir.y), scale = 0;
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) { // Blue tile
             tiles.setTile(TILE.NULL, posx, posy, true, true, true);
