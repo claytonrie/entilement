@@ -56,9 +56,9 @@ var SCOUT_CODE = {
 ////////////////////////////////////////////////////////////////////////////////
 // Named constants
 var COLOR = {
-    WHITE:     "#EEE",
-    LIGHT_RED: "#E77",
-    GOLD:      "#ED7",
+    WHITE:        "#EEE",
+    DARK_GRAY:    "#555",
+    LIGHT_PURPLE: "#E4E",
     
     BLUE:   "#00E",
     RED:    "#E00",
@@ -122,8 +122,8 @@ TILE_COLOR.INNER_TBL[TILE.WALL]      = COLOR.STEEL;
 
 var MOVES_COLOR = [];
 MOVES_COLOR[MOVES.WHITE] = COLOR.WHITE;
-MOVES_COLOR[MOVES.RED]   = COLOR.LIGHT_RED;
-MOVES_COLOR[MOVES.GOLD]  = COLOR.GOLD;
+MOVES_COLOR[MOVES.RED]   = COLOR.DARK_GRAY;
+MOVES_COLOR[MOVES.GOLD]  = COLOR.LIGHT_PURPLE;
 
 var TILE_TRAVEL_TBL = [];
 TILE_TRAVEL_TBL[TILE.BLUE]   = 1;
