@@ -125,10 +125,14 @@ var player = new (class extends TransitObj {
     }
     
     scoutMove (dir) {
-        let scout1 = Tile.onStepScout(tiles.getTile(this.scout.x, this.scout.y), dir);
-        let scout2 =  Tile.onLandScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        let ret = Tile.onStepScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        if (!ret) {
+            UndoHandler.undoScout();
+            return SCOUT_CODE.INVALID;
+        }
+        ret = Tile.onLandScout(tiles.getTile(this.scout.x, this.scout.y), dir);
         UndoHandler.undoScout();
-        return scout1 && scout2;
+        return ret;
     }
     
     /*handlePreviousMoves() {
