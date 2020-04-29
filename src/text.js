@@ -1,44 +1,43 @@
-var texts = new (class {
-    constructor() {
-        this.char = [];
-        this.x = []; this.y = [];
-        this.off = [];
-        this.size = [];
-        this.color = [];
-        this.pos = [];
-        this.time = [];
-        this.length = 0;
-        this.stopTime = false;
-    }
+var text = {
+    // Variables
+    // possibly TODO: change these into typed arrays?
+    char: [],
+    x: [], y: [],
+    off: [],
+    size: [],
+    color: [],
+    pos: [],
+    time: [],
+    length: 0,
+    stopTime: false,
 
+    // Methods
     drawAll (dt) {
         let i = this.length - 1;
         for (; i >= 0; i -= 1) {
             TextAnimation.advanceDraw(dt, i);
         }
-    }
-})();
-
-class TextAnimation {
-    constructor (txt, x, y, color, size, off = i => 0) {
+    },
+    
+    create (txt, x, y, color, size, off = (i => 0)) {
         let i = txt.length - 1;
         for (; i >= 0; i -= 1) {
             if (txt[i] === " ") {
                 continue;
             }
-            texts.char.push(txt[i]);
-            texts.x.push(x + 0.5 * size * i);
-            texts.y.push(y);
-            texts.pos.push(i);
-            texts.size.push(size);
-            texts.color.push(color);
-            texts.off.push(off(i, size, x + 0.5 * size * i, y, txt.length));
-            texts.time.push(0);
-            texts.length += 1;
+            this.char.push(txt[i]);
+            this.x.push(x + 0.5 * size * i);
+            this.y.push(y);
+            this.pos.push(i);
+            this.size.push(size);
+            this.color.push(color);
+            this.off.push(off(i, size, x + 0.5 * size * i, y, txt.length));
+            this.time.push(0);
+            this.length += 1;
         }
-    }
+    },
 
-    static advanceDraw(dt, ind) {
+    advanceDraw(dt, ind) {
         const len0 = 64,
             len1 = 512,
             len2 = 512,
@@ -51,14 +50,14 @@ class TextAnimation {
             phase3 = phase2 + len3,
             phase4 = phase3 + len4,
             phase5 = phase4 + len5;
-        Drawer.size = texts.size[ind];
-        texts.time[ind] += dt;
+        Drawer.size = this.size[ind];
+        this.time[ind] += dt;
         let op, inColor, outColor;
-        let eTime = texts.time[ind] - 64 * texts.pos[ind],
+        let eTime = this.time[ind] - 64 * this.pos[ind],
             phTime;
-        let txt = texts.char[ind], x = texts.x[ind],
-            y = texts.y[ind], sz = texts.size[ind],
-            off = texts.off[ind];
+        let txt = this.char[ind], x = this.x[ind],
+            y = this.y[ind], sz = this.size[ind],
+            off = this.off[ind];
         Drawer.ctx.font = `${sz * Drawer.scale}px monospace`;
         if (eTime < phase5) {
             Drawer.lineWidth = sz / 40;
@@ -68,19 +67,19 @@ class TextAnimation {
                 Drawer.color = "#DDD";
                 Drawer.drawText(true, txt, x, y - sz * phTime,
                     1 - phTime);
-                Drawer.color = texts.color[ind];
+                Drawer.color = this.color[ind];
                 Drawer.drawText(false, txt, x, y - sz * phTime,
                     1 - phTime);
-            } else if (eTime > phase3 || texts.time[ind] < 0) {
+            } else if (eTime > phase3 || this.time[ind] < 0) {
                 // Phase 4
                 Drawer.color = "#DDD";
                 Drawer.drawText(true, txt, x, y);
-                Drawer.color = texts.color[ind];
+                Drawer.color = this.color[ind];
                 Drawer.drawText(false, txt, x, y);
-                if (texts.time[ind] < 0 && !texts.stopTime) {
-                    texts.time[ind] = phase4;
-                } else if (texts.time[ind] > 0 && texts.stopTime) {
-                    texts.time[ind] = -Infinity;
+                if (this.time[ind] < 0 && !this.stopTime) {
+                    this.time[ind] = phase4;
+                } else if (this.time[ind] > 0 && this.stopTime) {
+                    this.time[ind] = -Infinity;
                 }
             } else if (eTime > phase2) {
                 // Phase 3
@@ -88,10 +87,10 @@ class TextAnimation {
                 // Real text
                 Drawer.color = "#DDD";
                 Drawer.drawText(true, txt, x, y, phTime);
-                Drawer.color = texts.color[ind];
+                Drawer.color = this.color[ind];
                 Drawer.drawText(false, txt, x, y, phTime);
                 // Miscolored text
-                Drawer.color = texts.color[ind];
+                Drawer.color = this.color[ind];
                 Drawer.drawText(true, txt, x, y, 1 - phTime);
                 Drawer.color = "#888";
                 Drawer.drawText(false, txt, x, y, 1 - phTime);
@@ -99,7 +98,7 @@ class TextAnimation {
                 // Phase 2
                 phTime = (eTime - phase1) / len2;
                 // Miscolored text
-                Drawer.color = texts.color[ind];
+                Drawer.color = this.color[ind];
                 Drawer.drawText(true, txt, x, y, phTime);
                 Drawer.color = "#888";
                 Drawer.drawText(false, txt, x, y, phTime);
@@ -113,15 +112,15 @@ class TextAnimation {
                 Drawer.drawText(true, txt, x + off, y + sz * (1 - phTime), phTime);
             }
         } else {
-            texts.char.splice(ind, 1);
-            texts.x.splice(ind, 1);
-            texts.y.splice(ind, 1);
-            texts.pos.splice(ind, 1);
-            texts.color.splice(ind, 1);
-            texts.size.splice(ind, 1);
-            texts.time.splice(ind, 1);
-            texts.off.splice(ind, 1);
-            texts.length -= 1;
+            this.char.splice(ind, 1);
+            this.x.splice(ind, 1);
+            this.y.splice(ind, 1);
+            this.pos.splice(ind, 1);
+            this.color.splice(ind, 1);
+            this.size.splice(ind, 1);
+            this.time.splice(ind, 1);
+            this.off.splice(ind, 1);
+            this.length -= 1;
         }
     }
-}
+};
