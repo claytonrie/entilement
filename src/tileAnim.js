@@ -1,49 +1,59 @@
-class TileAnimation {
-    constructor (type, x, y) {
-        tiles.atype[tiles.alength] = type;
-        tiles.ax[tiles.alength] = x;
-        tiles.ay[tiles.alength] = y;
-        tiles.atime[tiles.alength] = 0;
-        tiles.alength += 1;
+ const TILE_MAX_X = 16,
+       TILE_MAX_Y = 16,
+       TILE_MAX   = TILE_MAX_X * TILE_MAX_Y;
+var tileAnim = {
+    type: new Uint8Array(TILE_MAX),
+    x: new Int16Array(TILE_MAX), y: new Int16Array(TILE_MAX),
+    time: new Uint16Array(TILE_MAX),
+    length: 0,
+    
+    animate: [],
+    
+    create (type, x, y) {
+        this.type[this.length] = type;
+        this.x[this.length] = x;
+        this.y[this.length] = y;
+        this.time[this.length] = 0;
+        this.length += 1;
         return true;
-    }
+    },
 
-    static advanceDraw(dt, ind) {
-        tiles.atime[ind] += dt;
-        if (TileAnimation.animate[tiles.atype[ind]](dt, ind)) {
+    advanceDraw(dt, ind) {
+        this.time[ind] += dt;
+        if (this.animate[this.type[ind]](dt, ind)) {
             // Delete tile animation if done
-            tiles.alength -= 1;
-            if (ind < tiles.alength) {
-                tiles.atype[ind] = tiles.atype[tiles.alength];
-                tiles.ax[ind] = tiles.ax[tiles.alength];
-                tiles.ay[ind] = tiles.ay[tiles.alength];
-                tiles.atime[ind] = tiles.atime[tiles.alength];
+            this.length -= 1;
+            if (ind < this.length) {
+                this.type[ind] = this.type[this.length];
+                this.x[ind] = this.x[this.length];
+                this.y[ind] = this.y[this.length];
+                this.time[ind] = this.time[this.length];
             }
             return false;
         }
         return true;
-    }
+    },
 
-    static shrink (dt, ind, color)  {
-        let shrink = tiles.atime[ind] / 64;
+    shrink (dt, ind, color)  {
+        let shrink = this.time[ind] / 64;
         if (shrink >= 8) { return true; }
         Drawer.setLineWidth(3 / shrink).setColor(color);
-        Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
+        Drawer.drawRect(true, this.x[ind] + shrink, this.y[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
-    }
-    static shrinkFill (dt, ind, color)  {
-        let shrink = tiles.atime[ind] / 64;
+    },
+    shrinkFill (dt, ind, color)  {
+        let shrink = this.time[ind] / 64;
         if (shrink >= 8) { return true; }
         Drawer.setLineWidth(3 / shrink).setColor(color);
-        Drawer.drawRect(false, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
+        Drawer.drawRect(false, this.x[ind] + shrink, this.y[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink, 0.5);
-        Drawer.drawRect(true, tiles.ax[ind] + shrink, tiles.ay[ind] + shrink,
+        Drawer.drawRect(true, this.x[ind] + shrink, this.y[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
-    }
+    },
     
-    static RNG (x, y, seed, max) {
+    RNG (x, y, seed, max) {
         // TODO: make an actual peudoRNG generator
         //   This one does a bunch of shit to the numbers to obscure the result, but it probably has some big bias
     	let X1 = x / 16 + 0.1725 * seed * y / 4 + 3.4, X2 = y / 16 + 0.096 * seed * x / 4 + 3.2;
@@ -52,76 +62,75 @@ class TileAnimation {
     }
 }
 
-TileAnimation.animate = [];
-TileAnimation.animate[TILE_ANIM.BLUE] = function (dt, ind) {
-    return TileAnimation.shrink(dt, ind, COLOR.BLUE);
+tileAnim.animate[TILE_ANIM.BLUE] = function (dt, ind) {
+    return tileAnim.shrink(dt, ind, COLOR.BLUE);
 };
-TileAnimation.animate[TILE_ANIM.RED] = function (dt, ind) {
-    return TileAnimation.shrink(dt, ind, COLOR.RED);
+tileAnim.animate[TILE_ANIM.RED] = function (dt, ind) {
+    return tileAnim.shrink(dt, ind, COLOR.RED);
 };
-TileAnimation.animate[TILE_ANIM.GREEN] = function (dt, ind) {
-    return TileAnimation.shrink(dt, ind, COLOR.GREEN);
+tileAnim.animate[TILE_ANIM.GREEN] = function (dt, ind) {
+    return tileAnim.shrink(dt, ind, COLOR.GREEN);
 };
-TileAnimation.animate[TILE_ANIM.ORANGE] = function (dt, ind) {
-    let op = 1 - (tiles.atime[ind] / 512);
+tileAnim.animate[TILE_ANIM.ORANGE] = function (dt, ind) {
+    let op = 1 - (tileAnim.time[ind] / 512);
     Drawer.lineWidth = 3;
     if (op <= 0) { return true; }
     Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE]);
-    Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+    Drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
-TileAnimation.animate[TILE_ANIM.DOUBLE_BLUE] = function (dt, ind) {
-    return TileAnimation.shrinkFill(dt, ind, COLOR.BLUE);
+tileAnim.animate[TILE_ANIM.DOUBLE_BLUE] = function (dt, ind) {
+    return tileAnim.shrinkFill(dt, ind, COLOR.BLUE);
 };
-TileAnimation.animate[TILE_ANIM.DOUBLE_RED] = function (dt, ind) {
-    return TileAnimation.shrinkFill(dt, ind, COLOR.RED);
+tileAnim.animate[TILE_ANIM.DOUBLE_RED] = function (dt, ind) {
+    return tileAnim.shrinkFill(dt, ind, COLOR.RED);
 };
-TileAnimation.animate[TILE_ANIM.DOUBLE_ORANGE] = function (dt, ind) {
-    let op = 1 - (tiles.atime[ind] / 512);
+tileAnim.animate[TILE_ANIM.DOUBLE_ORANGE] = function (dt, ind) {
+    let op = 1 - (tileAnim.time[ind] / 512);
     if (op <= 0) { return true; }
     Drawer.color = TILE_COLOR.INNER_TBL[TILE.DOUBLE_ORANGE];
-    Drawer.drawRect(false, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75 * op);
+    Drawer.drawRect(false, tileAnim.x[ind], tileAnim.y[ind], 16, 16, 0.75 * op);
     return false;
 };
-TileAnimation.animate[TILE_ANIM.ORANGE_RED] = function (dt, ind) {
-    let op = 1 - (tiles.atime[ind] / 512);
+tileAnim.animate[TILE_ANIM.ORANGE_RED] = function (dt, ind) {
+    let op = 1 - (tileAnim.time[ind] / 512);
     if (op <= 0) { return true; }
     Drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_RED]);
-    Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
+    Drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, 0.75);
     Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_RED]);
-    Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+    Drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
-TileAnimation.animate[TILE_ANIM.ORANGE_GREEN] = function (dt, ind) {
-    let op = 1 - (tiles.atime[ind] / 512);
+tileAnim.animate[TILE_ANIM.ORANGE_GREEN] = function (dt, ind) {
+    let op = 1 - (tileAnim.time[ind] / 512);
     if (op <= 0) { return true; }
     Drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_GREEN]);
-    Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, 0.75);
+    Drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, 0.75);
     Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_GREEN]);
-    Drawer.drawRect(true, tiles.ax[ind], tiles.ay[ind], 16, 16, op);
+    Drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
-TileAnimation.animate[TILE_ANIM.YELLOW] = function (dt, ind) {
-    return TileAnimation.shrink(dt, ind, COLOR.YELLOW);
+tileAnim.animate[TILE_ANIM.YELLOW] = function (dt, ind) {
+    return tileAnim.shrink(dt, ind, COLOR.YELLOW);
 };
-TileAnimation.animate[TILE_ANIM.ICE] = function (dt, ind) {
-    let op = 1 - (tiles.atime[ind] / 512) / 2,
-        pos = 8 * tiles.atime[ind] / 512 / 2;
+tileAnim.animate[TILE_ANIM.ICE] = function (dt, ind) {
+    let op = 1 - (tileAnim.time[ind] / 512) / 2,
+        pos = 8 * tileAnim.time[ind] / 512 / 2;
     if (op <= 0) { return true; }
     Drawer.setColor(TILE_COLOR.OUTER_TBL[TILE.ICE]);
-    let rand1 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 0, 2) - 1,
-        rand2 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 1, 2) - 1,
-        rand3 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 2, 2) - 1,
-        rand4 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 3, 2) - 1,
-        rand5 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 4, 2) - 1,
-        rand6 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 5, 2) - 1,
-        rand7 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 6, 2) - 1,
-        rand8 = 2 * TileAnimation.RNG(tiles.ax[ind], tiles.ay[ind], 7, 2) - 1;
-    Drawer.drawRect(false, tiles.ax[ind] + rand1 * pos, tiles.ay[ind] + rand5 * pos, 3 * op, 13, op);
-    Drawer.drawRect(false, tiles.ax[ind] + rand2 * pos + 3 * op, tiles.ay[ind] + rand6 * pos, 13, 3 * op, op);
-    Drawer.drawRect(false, tiles.ax[ind] + rand3 * pos + 16, tiles.ay[ind] + rand7 * pos + 3, 
+    let rand1 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 0, 2) - 1,
+        rand2 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 1, 2) - 1,
+        rand3 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 2, 2) - 1,
+        rand4 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 3, 2) - 1,
+        rand5 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 4, 2) - 1,
+        rand6 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 5, 2) - 1,
+        rand7 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 6, 2) - 1,
+        rand8 = 2 * tileAnim.RNG(tileAnim.x[ind], tileAnim.y[ind], 7, 2) - 1;
+    Drawer.drawRect(false, tileAnim.x[ind] + rand1 * pos, tileAnim.y[ind] + rand5 * pos, 3 * op, 13, op);
+    Drawer.drawRect(false, tileAnim.x[ind] + rand2 * pos + 3 * op, tileAnim.y[ind] + rand6 * pos, 13, 3 * op, op);
+    Drawer.drawRect(false, tileAnim.x[ind] + rand3 * pos + 16, tileAnim.y[ind] + rand7 * pos + 3, 
         -3 * op, 13, op);
-    Drawer.drawRect(false, tiles.ax[ind] + rand4 * pos + 3 * (1 - op), tiles.ay[ind] + rand8 * pos + 16, 
+    Drawer.drawRect(false, tileAnim.x[ind] + rand4 * pos + 3 * (1 - op), tileAnim.y[ind] + rand8 * pos + 16, 
         13, -3 * op, op);
     return false;
 };
