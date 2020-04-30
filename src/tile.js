@@ -66,9 +66,9 @@ var tile = {
         // Handle storing this tile update
         if (doUndo) {
             if (doScout) {
-                UndoHandler.addScoutUpdate(prevType, bx, by);
+                undo.addScoutUpdate(prevType, bx, by);
             } else {
-                UndoHandler.addTileUpdate(prevType, ind);
+                undo.addTileUpdate(prevType, ind);
             }
         }
         // Handle updating the total number of tiles
@@ -132,11 +132,11 @@ var tile = {
         let dx = x - (x % 16),
             dy = y - (y % 16);
         if (TILE_COLOR.INNER_TBL[type] !== null) {
-            Drawer.color = TILE_COLOR.INNER_TBL[type];
-            Drawer.drawRect(false, dx, dy, 16, 16, 0.75);
+            drawer.color = TILE_COLOR.INNER_TBL[type];
+            drawer.drawRect(false, dx, dy, 16, 16, 0.75);
         }
-        Drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[type]);
-        Drawer.drawRect(true, dx, dy, 16, 16);
+        drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[type]);
+        drawer.drawRect(true, dx, dy, 16, 16);
     },
     drawAll(dt) {
         let i = this.max - 1;
@@ -176,7 +176,7 @@ var tile = {
             this.setTile(TILE.BLUE, posx, posy);
             tileAnimation.create(TILE_ANIM.ORANGE, posx, posy);
         } else if (type === TILE.STEEL) { // Never breaks
-            UndoHandler.addTileUpdate(TILE.STEEL, this.getIndex(posx, posy));
+            undo.addTileUpdate(TILE.STEEL, this.getIndex(posx, posy));
         } else if (type === TILE.DOUBLE_BLUE) { // Goes diagonal
             this.setTile(TILE.NULL, posx, posy);
             tileAnimation.create(TILE_ANIM.DOUBLE_BLUE, posx, posy);
@@ -226,7 +226,7 @@ var tile = {
         else if (type === TILE.ORANGE) {
             this.setTile(TILE.BLUE, posx, posy, true, true, true);
         } else if (type === TILE.STEEL) {
-            UndoHandler.addScoutUpdate(TILE.STEEL, this.getIndex(posx, posy));
+            undo.addScoutUpdate(TILE.STEEL, this.getIndex(posx, posy));
         } else if (type === TILE.DOUBLE_BLUE) { // Goes diagonal
             this.setTile(TILE.NULL, posx, posy, true, true, true);
         } else if (type === TILE.DOUBLE_RED) { // Goes diagonal
