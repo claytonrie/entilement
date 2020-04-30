@@ -111,10 +111,10 @@ var player = {
             throw new Error(`Invalid direction: ${dir}`);
         }
         // Set-up undo
-        UndoHandler.startMove();
+        undo.startMove();
         // Run tile-type-based scripts
-        Tile.onStep(tiles.getTile(this.to.tar.x, this.to.tar.y), dir);
-        let ret = Tile.onLand(tiles.getTile(this.to.tar.x, this.to.tar.y), dir);
+        tile.onStep(tile.getTile(this.to.tar.x, this.to.tar.y), dir);
+        let ret = tile.onLand(tile.getTile(this.to.tar.x, this.to.tar.y), dir);
         // Record whether we are on a diagonal tile
         if (ret < 0) { this.onDiagonal = true; }
         else { this.onDiagonal = false; }
@@ -124,7 +124,7 @@ var player = {
     
     scoutAllMoves () {
     	let dir = new Vec2();
-        UndoHandler.startScout();
+        undo.startScout();
         dir.y = -1; this.scoutResult.up    = this.scoutMove(dir);
         dir.y =  1; this.scoutResult.down  = this.scoutMove(dir);
         dir.y =  0;
@@ -133,13 +133,13 @@ var player = {
     },
     
     scoutMove (dir) {
-        let ret = Tile.onStepScout(tiles.getTile(this.scout.x, this.scout.y), dir);
+        let ret = tile.onStepScout(tile.getTile(this.scout.x, this.scout.y), dir);
         if (!ret) {
-            UndoHandler.undoScout();
+            undo.undoScout();
             return SCOUT_CODE.INVALID;
         }
-        ret = Tile.onLandScout(tiles.getTile(this.scout.x, this.scout.y), dir);
-        UndoHandler.undoScout();
+        ret = tile.onLandScout(tile.getTile(this.scout.x, this.scout.y), dir);
+        undo.undoScout();
         return ret;
     },
     
