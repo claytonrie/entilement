@@ -15,7 +15,7 @@ var text = {
     drawAll (dt) {
         let i = this.length - 1;
         for (; i >= 0; i -= 1) {
-            TextAnimation.advanceDraw(dt, i);
+            this.advanceDraw(dt, i);
         }
     },
     
@@ -50,7 +50,7 @@ var text = {
             phase3 = phase2 + len3,
             phase4 = phase3 + len4,
             phase5 = phase4 + len5;
-        Drawer.size = this.size[ind];
+        drawer.size = this.size[ind];
         this.time[ind] += dt;
         let op, inColor, outColor;
         let eTime = this.time[ind] - 64 * this.pos[ind],
@@ -58,24 +58,24 @@ var text = {
         let txt = this.char[ind], x = this.x[ind],
             y = this.y[ind], sz = this.size[ind],
             off = this.off[ind];
-        Drawer.ctx.font = `${sz * Drawer.scale}px monospace`;
+        drawer.ctx.font = `${sz * drawer.scale}px monospace`;
         if (eTime < phase5) {
-            Drawer.lineWidth = sz / 40;
+            drawer.lineWidth = sz / 40;
             if (eTime > phase4) {
                 // Phase 5
                 phTime = (eTime - phase4) / len5;
-                Drawer.color = "#DDD";
-                Drawer.drawText(true, txt, x, y - sz * phTime,
+                drawer.color = "#DDD";
+                drawer.drawText(true, txt, x, y - sz * phTime,
                     1 - phTime);
-                Drawer.color = this.color[ind];
-                Drawer.drawText(false, txt, x, y - sz * phTime,
+                drawer.color = this.color[ind];
+                drawer.drawText(false, txt, x, y - sz * phTime,
                     1 - phTime);
             } else if (eTime > phase3 || this.time[ind] < 0) {
                 // Phase 4
-                Drawer.color = "#DDD";
-                Drawer.drawText(true, txt, x, y);
-                Drawer.color = this.color[ind];
-                Drawer.drawText(false, txt, x, y);
+                drawer.color = "#DDD";
+                drawer.drawText(true, txt, x, y);
+                drawer.color = this.color[ind];
+                drawer.drawText(false, txt, x, y);
                 if (this.time[ind] < 0 && !this.stopTime) {
                     this.time[ind] = phase4;
                 } else if (this.time[ind] > 0 && this.stopTime) {
@@ -85,31 +85,31 @@ var text = {
                 // Phase 3
                 phTime = (eTime - phase2) / len3;
                 // Real text
-                Drawer.color = "#DDD";
-                Drawer.drawText(true, txt, x, y, phTime);
-                Drawer.color = this.color[ind];
-                Drawer.drawText(false, txt, x, y, phTime);
+                drawer.color = "#DDD";
+                drawer.drawText(true, txt, x, y, phTime);
+                drawer.color = this.color[ind];
+                drawer.drawText(false, txt, x, y, phTime);
                 // Miscolored text
-                Drawer.color = this.color[ind];
-                Drawer.drawText(true, txt, x, y, 1 - phTime);
-                Drawer.color = "#888";
-                Drawer.drawText(false, txt, x, y, 1 - phTime);
+                drawer.color = this.color[ind];
+                drawer.drawText(true, txt, x, y, 1 - phTime);
+                drawer.color = "#888";
+                drawer.drawText(false, txt, x, y, 1 - phTime);
             } else if (eTime > phase1) {
                 // Phase 2
                 phTime = (eTime - phase1) / len2;
                 // Miscolored text
-                Drawer.color = this.color[ind];
-                Drawer.drawText(true, txt, x, y, phTime);
-                Drawer.color = "#888";
-                Drawer.drawText(false, txt, x, y, phTime);
+                drawer.color = this.color[ind];
+                drawer.drawText(true, txt, x, y, phTime);
+                drawer.color = "#888";
+                drawer.drawText(false, txt, x, y, phTime);
                 // Stroke text
-                Drawer.color = "#FFF";
-                Drawer.drawText(true, txt, x + off * (1 - phTime), y, 1 - phTime);
+                drawer.color = "#FFF";
+                drawer.drawText(true, txt, x + off * (1 - phTime), y, 1 - phTime);
             } else if (eTime > phase0) {
                 // Phase 1
                 phTime = (eTime - phase0) / len1;
-                Drawer.color = "#FFF";
-                Drawer.drawText(true, txt, x + off, y + sz * (1 - phTime), phTime);
+                drawer.color = "#FFF";
+                drawer.drawText(true, txt, x + off, y + sz * (1 - phTime), phTime);
             }
         } else {
             this.char.splice(ind, 1);
