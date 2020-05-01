@@ -1,4 +1,3 @@
-const MOVE_IND_MAX = 4 * 4;
 var moveInd = {
     max: MOVE_IND_MAX,
     length: 0,
