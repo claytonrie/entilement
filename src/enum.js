@@ -1,5 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Enumerated constants
+var GAME = {
+    MENU:      0,
+    FADE:      1,
+    PASS:      2,
+    CONSTRUCT: 3,
+    PLAY:      4,
+    RETRY:     5
+};
+
 var TILE = {
     NULL:         -1,
     BLUE:          0,
@@ -143,3 +152,11 @@ TILE_TRAVEL_TBL[TILE.ICE]       = 0;
 TILE_TRAVEL_TBL[TILE.ICE_RED]   = 2;
 TILE_TRAVEL_TBL[TILE.ICE_GREEN] = 3;
 TILE_TRAVEL_TBL[TILE.WALL]      = 0;
+
+var LEVEL = {
+    CHAR_TABLE: "0123456789abcdefghijklmnopqrstuvwxyz" + 
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[{]}|;:',<.>/?~` ",
+    DATA:    [],
+    CHAPTER: [],
+    COLOR:   []
+};
