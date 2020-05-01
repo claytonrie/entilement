@@ -1,80 +1,80 @@
+function update() {
+    game.run();
+}
+
 var game = {
     time: Date.now(),
     runTime: 0, dt: 0,
-    
+
     FPS: 40,
     clock: null,
-    
+
     lastRanMode: null,
-    mode: 0,
+    mode: GAME.MENU,
     modeTable: [],
-    
+
     triggered: {
         wasd: false,
         undo: false
     },
-    
+
     init(mode) {
-    	if (typeof mode === 'number') this.mode = mode;
+        if (typeof mode === 'number') this.mode = mode;
         if (this.clock !== null) {
-        	clearInterval(this.clock);
+            clearInterval(this.clock);
         }
         this.clock = setInterval(update, 1000 / this.FPS);
     },
-    
+
     run(mode = this.mode) {
-		this.dt = Date.now() - this.time;
+        this.dt = Date.now() - this.time;
         this.time = Date.now();
         if (this.lastRanMode !== mode) {
-        	this.lastRanMode = mode;
+            this.lastRanMode = mode;
             this.runTime = 0;
         }
         this.modeTable[this.mode](this.dt);
+        this.runTime += this.dt;
     }
 };
 
 game.modeTable[GAME.MENU] = function (dt) {
-    if (!text.stopTime && Game.runTime > 1024) {
+    if (!text.stopTime && game.runTime > 1024) {
         text.stopTime = true;
-        new text("En", 2 * 24 * 0.6, SZ / 2 - 12, COLOR.PURPLE, 24,
+        text.create("En", 2 * 24 * 0.6, SZ / 2 - 12, COLOR.PURPLE, 24,
             (i, sz) => 1.5 * sz * (Math.random() - 0.5));
-        new text("  tile", 2.5 * 24 * 0.6, SZ / 2 - 16, COLOR.PURPLE, 24,
+        text.create("  tile", 2.5 * 24 * 0.6, SZ / 2 - 16, COLOR.PURPLE, 24,
             (i, sz) => 1.5 * sz * (Math.random() - 0.5));
-        new text("      ment", 3 * 24 * 0.6, SZ / 2 - 12, COLOR.PURPLE, 24,
+        text.create("      ment", 3 * 24 * 0.6, SZ / 2 - 12, COLOR.PURPLE, 24,
             (i, sz) => 1.5 * sz * (Math.random() - 0.5));
     } 
-    if (Game.runTime > 1024 + 1024) {
-        new text("Press any keyInt", SZ / 2, SZ / 2 + 36, COLOR.YELLOW, 12,
+    if (game.runTime > 1024 + 1024) {
+        text.create("Press any key", SZ / 2, SZ / 2 + 36, COLOR.YELLOW, 12,
             (i, sz) => -0.5 * sz);
-        Game.runTime = -Infinity;
+        game.runTime = -Infinity;
     }
-    Game.runTime += dt;
     if (keyInt.buffered.size > 0) {
-        Game.mode = GAME.FADE;
+        game.mode = GAME.FADE;
     }
-    Drawer.color = "#000";
-    Drawer.drawRect(false, 0, 0, SZ, SZ);
+    drawer.color = "#000";
+    drawer.drawRect(false, 0, 0, SZ, SZ);
     text.drawAll(dt);
 };
 
 game.modeTable[GAME.FADE] = function (dt) {
-    player.to.pos.x = -8;
-    player.to.pos.y = -8;
-    player.to.tar.x = -8;
-    player.to.tar.y = -8;
+    player.to.pos.x = -8; player.to.pos.y = -8;
+    player.to.tar.x = -8; player.to.tar.y = -8;
     level.current = -1;
-    let i = text.length - 1;
     text.stopTime = false;
-    Game.mode = 5;
+    game.mode = GAME.PASS;
 };
 
 game.modeTable[GAME.CONSTRUCT] = function (dt) {
     keyInt.update(dt);
     
-    Game.runTime += dt;
     const ttime = 113 / (1 + level.size / 4);
-    while (Game.runTime > ttime) {
-        Game.runTime -= ttime;
+    while (game.runTime > ttime) {
+        game.runTime -= ttime;
         let len = (level.reserve.length / 3) | 0;
         if (len > level.size / 2) {
             keyInt.clearBuffer();
@@ -82,7 +82,7 @@ game.modeTable[GAME.CONSTRUCT] = function (dt) {
         if (len === 1) {
             tile.setTile(level.reserve[0], level.reserve[1], level.reserve[2],
                  false, false);
-            Game.mode = GAME.PLAY;
+            game.mode = GAME.PLAY;
 
             // Reset level variables
             player.canMove = true;
@@ -100,12 +100,13 @@ game.modeTable[GAME.CONSTRUCT] = function (dt) {
             level.reserve[3 * rand + 2], false, false);
         level.reserve.splice(3 * rand, 3);
     }
+    
     if (!player.to.atTarget) {
-        player.to.smoothTransition(dt / 2);
+        player.to.smoothTransition(dt);
     }
 
-    Drawer.color = "#000";
-    Drawer.drawRect(false, 0, 0, SZ, SZ);
+    drawer.color = "#000";
+    drawer.drawRect(false, 0, 0, SZ, SZ);
     tile.drawAll(dt);
     player.draw();
     text.drawAll(dt);
@@ -115,25 +116,24 @@ game.modeTable[GAME.CONSTRUCT] = function (dt) {
 game.modeTable[GAME.RETRY] = function (dt) {
     keyInt.update(dt);
     
-    if (Game.runTime === 0) {
+    if (game.runTime === 0) {
         level.load(level.current, false);
         new MoveAnimation(0);
     }
-    Game.runTime += dt;
-    if (Game.runTime > 512) {
+    if (game.runTime > 512) {
         level.reset();
-        Game.mode = 2;
+        game.mode = 2;
         return;
     }
     if (!player.to.atTarget) {
-        player.to.smoothTransition(dt / (8 - (6 * Game.runTime / 512)));
+        player.to.smoothTransition(dt / (8 - (6 * game.runTime / 512)));
     }
 
-    Drawer.color = "#000";
-    Drawer.drawRect(false, 0, 0, SZ, SZ);
-    Drawer.op = 1 - (Game.runTime / 512);
+    drawer.color = "#000";
+    drawer.drawRect(false, 0, 0, SZ, SZ);
+    drawer.op = 1 - (game.runTime / 512);
     tile.drawAll(dt);
-    Drawer.op = 1;
+    drawer.op = 1;
     player.draw();
     text.drawAll(dt);
     moves.drawAll(dt);
@@ -157,7 +157,7 @@ game.modeTable[GAME.PLAY] = function (dt) {
     }
 
     if (keyInt.isPressed("r", 500)) {
-        Game.mode = GAME.RETRY;
+        game.mode = GAME.RETRY;
     }
 
     // Undo moves
@@ -184,8 +184,8 @@ game.modeTable[GAME.PLAY] = function (dt) {
     }
 
     // Draw stuff
-    Drawer.color = "#000";
-    Drawer.drawRect(false, 0, 0, SZ, SZ);
+    drawer.color = "#000";
+    drawer.drawRect(false, 0, 0, SZ, SZ);
     tile.drawAll(dt);
 
     player.draw();
@@ -194,34 +194,36 @@ game.modeTable[GAME.PLAY] = function (dt) {
     text.drawAll(dt);
 };
     
-game.modeTable[GAME.COMPLETE] = function (dt) {
-    if (Game.runTime === 0) {
+game.modeTable[GAME.PASS] = function (dt) {
+    if (game.runTime === 0) {
         new MoveAnimation(0);
         if (level.textData[level.current + 1] !== null) {
             let rand = (Math.random() * 4 | 0) * 6 - 12;
             if (rand >= 0) {
                 rand += 6;
             }
-            new text(level.textData[level.current + 1],
+            text.create(level.textData[level.current + 1],
                 10, SZ - 32, level.colorData[level.current + 1], 24,
                 i => rand);
         }
-    }
-    Game.runTime += dt;
-    if (Game.runTime > 512) {
+    } else if (game.runTime > 512) {
         level.load(level.current + 1);
         return;
     }
+    
     if (!player.to.atTarget) {
         player.to.smoothTransition(dt);
     }
 
-    Drawer.color = "#000";
-    Drawer.drawRect(false, 0, 0, SZ, SZ);
-    Drawer.op = 1 - (Game.runTime / 512);
+    // Draw
+    drawer.color = "#000";
+    drawer.drawRect(false, 0, 0, SZ, SZ);
+    
+    drawer.op = 1 - (game.runTime / 512);
     tile.drawAll(dt);
     moves.drawAll(dt);
-    Drawer.op = 1;
+    drawer.op = 1;
+    
     player.draw();
     text.drawAll(dt);
 };
