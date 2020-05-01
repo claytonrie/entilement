@@ -1,6 +1,3 @@
-const TILE_MAX_X = 16,
-       TILE_MAX_Y = 16,
-       TILE_MAX   = TILE_MAX_X * TILE_MAX_Y;
 var tileAnim = {
     type: new Uint8Array(TILE_MAX),
     x: new Int16Array(TILE_MAX), y: new Int16Array(TILE_MAX),
