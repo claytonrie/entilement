@@ -1,7 +1,5 @@
-const TMULT = 256;
 class TransitObj {
     constructor (x, y, tx = x, ty = y, vx = 0, vy = 0) {
-        const TIME_DUR = 256;
         // The position of the object in transition
         this.pos = new Vec2(x, y);
         // The target position of the transition
@@ -16,12 +14,12 @@ class TransitObj {
         if (tx === x) {
             this.slopeVar.x = 0;
         } else {
-            this.slopeVar.x = vx / (tx - x) + 1 / TIME_DUR;
+            this.slopeVar.x = vx / (tx - x) + 1 / TO_TIME_DUR;
         }
         if (ty === y) {
             this.slopeVar.y = 0;
         } else {
-            this.slopeVar.y = vy / (ty - y) + 1 / TIME_DUR;
+            this.slopeVar.y = vy / (ty - y) + 1 / TO_TIME_DUR;
         }
         
         this.atTarget = false; // Whether the object is at its desination
@@ -29,14 +27,13 @@ class TransitObj {
 
     /// Gets the velocity at the current point of time and returns it as a Vec2
     getVel() {
-        const TIME_DUR = 256;
         let velx, vely;
-        if (this.time < TIME_DUR) { 
-            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+        if (this.time < TO_TIME_DUR) { 
+            let EXP = Math.exp(this.time / (this.time - TO_TIME_DUR));
             velx = this.distVar.x * EXP * (this.slopeVar.x - 
-                TIME_DUR * (this.slopeVar.x * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+                TO_TIME_DUR * (this.slopeVar.x * this.time + 1) / (this.time - TO_TIME_DUR) / (this.time - TO_TIME_DUR));
             vely = this.distVar.y * EXP * (this.slopeVar.y - 
-                TIME_DUR * (this.slopeVar.y * this.time + 1) / (this.time - TIME_DUR) / (this.time - TIME_DUR));
+                TO_TIME_DUR * (this.slopeVar.y * this.time + 1) / (this.time - TO_TIME_DUR) / (this.time - TO_TIME_DUR));
         } else {
             velx = vely = 0;
         }
@@ -45,7 +42,6 @@ class TransitObj {
     
     /// Stops the current transition and starts a new one
     resetTransition (atTarget = false) {
-        const TIME_DUR = 256;
         if (!atTarget) {
             let vel = this.getVel();
             this.distVar = this.pos.to(this.tar);
@@ -53,28 +49,27 @@ class TransitObj {
             if (this.distVar.x === 0) {
                 this.slopeVar.x = 0;
             } else {
-                this.slopeVar.x = vel.x / this.distVar.x + 1 / TIME_DUR;
+                this.slopeVar.x = vel.x / this.distVar.x + 1 / TO_TIME_DUR;
             }
             if (this.distVar.y === 0) {
                 this.slopeVar.y = 0;
             } else {
-                this.slopeVar.y = vel.y / this.distVar.y + 1 / TIME_DUR;
+                this.slopeVar.y = vel.y / this.distVar.y + 1 / TO_TIME_DUR;
             }
         } else {
             this.pos.x = this.tar.x;
             this.pos.y = this.tar.y;
-            this.time = TIME_DUR;
+            this.time = TO_TIME_DUR;
         }
         this.atTarget = atTarget;
     }
 
     /// Calculates one dt millisecond step along the objects transition
     smoothTransition (dt) {
-        const TIME_DUR = 256;
-        if (this.time >= TIME_DUR) {
+        if (this.time >= TO_TIME_DUR) {
             this.resetTransition(true);
         } else {
-            let EXP = Math.exp(this.time / (this.time - TIME_DUR));
+            let EXP = Math.exp(this.time / (this.time - TO_TIME_DUR));
             let newX = this.distVar.x * (this.slopeVar.x * this.time + 1) * EXP,
                 newY = this.distVar.y * (this.slopeVar.y * this.time + 1) * EXP;
             this.pos.x = this.tar.x - newX; this.pos.y = this.tar.y - newY;
@@ -148,14 +143,14 @@ var player = {
     draw () {
         // draw a light circle at the destination
         if (!this.to.atTarget) {
-            Drawer.setLineWidth(1).setColor("#FFF");
-            Drawer.drawCirc(true, this.to.tar, 7, 0.5);
+            drawer.setLineWidth(1).setColor("#FFF");
+            drawer.drawCirc(true, this.to.tar, 7, 0.5);
         }
         
         // draw the player at their appearing position
-        Drawer.color = "#FFF";
-        Drawer.drawCirc(false, this.to.pos, 7, 0.333);
-        Drawer.setLineWidth(3).setColor("yellow")
-        Drawer.drawCirc(true, this.to.pos, 7);
+        drawer.color = "#FFF";
+        drawer.drawCirc(false, this.to.pos, 7, 0.333);
+        drawer.setLineWidth(3).setColor("yellow")
+        drawer.drawCirc(true, this.to.pos, 7);
     }
 };
