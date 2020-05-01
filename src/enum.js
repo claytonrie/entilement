@@ -1,4 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////
+// Normal constants
+var MOVE_IND_MAX = 4 * 4;
+
+var TILE_MAX_X = 16,
+    TILE_MAX_Y = 16,
+    TILE_MAX   = TILE_MAX_X * TILE_MAX_Y;
+
+var TO_TIME_DUR = 256;
+
+var UNDO_MAX = TILE_MAX,
+    UNDO_SCOUT_MAX = Math.max(TILE_MAX_X, TILE_MAX_Y);
+
+////////////////////////////////////////////////////////////////////////////////
 // Enumerated constants
 var GAME = {
     MENU:      0,
