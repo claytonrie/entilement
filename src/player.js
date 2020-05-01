@@ -80,7 +80,7 @@ class TransitObj {
 
 var player = {
     // Variables
-    to: new TransitObject(-8, -8),
+    to: new TransitObj(-8, -8),
     canMove: true,
     onDiagonal: false,
     scoutResult: {
