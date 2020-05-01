@@ -332,7 +332,7 @@ var tile = {
 };
 
 // Initialize the board
-let i = TILES_MAX - 1;
+let i = TILE_MAX - 1;
 for (; i >= 0; i -= 1) {
     tile.type[i] = TILE.NULL;
 }
