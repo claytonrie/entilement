@@ -1,6 +1,4 @@
-const TILE_MAX_X = 16,
-      TILE_MAX_Y = 16,
-      TILE_MAX   = TILE_MAX_X * TILE_MAX_Y;
+
 var tile = {
     maxX: TILE_MAX_X, maxY: TILE_MAX_Y,
     max: TILE_MAX,
@@ -10,12 +8,6 @@ var tile = {
     //   INDEX = (x + maxX * y)
     //   VALUE = tile type
     type: new Int8Array(TILE_MAX),
-
-    // Tile Animations
-    atype: new Uint8Array(TILE_MAX),
-    ax: new Int16Array(TILE_MAX), ay: new Int16Array(TILE_MAX),
-    atime: new Uint16Array(TILE_MAX),
-    alength: 0,
 
     getTile (x, y, doDivide = true) {
         // Calculate the tile x and y grid positions
