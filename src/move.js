@@ -58,9 +58,9 @@ var moveInd = {
         this.time[this.length] = 0; this.ph[this.length] = phase;
         this.clr[this.length] = player.scoutResult.up;
         this.length += 1;
-    }
+    },
     
-    static createDiag(len, pos, phase, cpos, vel) {
+    createDiag (len, pos, phase, cpos, vel) {
         this.to.push(new TransitObj(pos.x, pos.y, cpos.x - 16 * len,
                 cpos.y - 16 * len, vel.x, vel.y));
         this.time[this.length] = 0; this.ph[this.length] = phase;
@@ -84,9 +84,9 @@ var moveInd = {
         this.time[this.length] = 0; this.ph[this.length] = phase;
         this.clr[this.length] = player.scoutResult.up;
         this.length += 1;
-    }
+    },
     
-    static createYellow(pos, phase, cpos, vel) {
+    createYellow (pos, phase, cpos, vel) {
         let res;
         res = 16 * tile.searchHorz(cpos.x + 16, cpos.y, false) + 8;
         this.to.push(new TransitObj(pos.x, pos.y, res, cpos.y, vel.x, vel.y));
@@ -111,7 +111,7 @@ var moveInd = {
         this.time[this.length] = 0; this.ph[this.length] = phase;
         this.clr[this.length] = player.scoutResult.up;
         this.length += 1;
-    }
+    },
     
     clear () {
         let i = this.length - 1;
@@ -132,7 +132,7 @@ var moveInd = {
         }
     },
     
-    static advanceDraw(dt, ind) {
+    advanceDraw(dt, ind) {
         this.time[ind] += dt;
         let op = 1;
         let x  = this.to[ind].pos.x, y  = this.to[ind].pos.y,
