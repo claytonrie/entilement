@@ -50,7 +50,7 @@ var text = {
             phase3 = phase2 + len3,
             phase4 = phase3 + len4,
             phase5 = phase4 + len5;
-        drawer.size = this.size[ind];
+        //drawer.font = this.size[ind];
         this.time[ind] += dt;
         let op, inColor, outColor;
         let eTime = this.time[ind] - 64 * this.pos[ind],
