@@ -47,7 +47,7 @@ var keyInt = {
         return this.buffered.has(key) && (this.buffered.get(key) < maxBuffer);
     },
     
-    useBuffer (key) { return this.buffer.delete(key); },
+    useBuffer (key) { return this.buffered.delete(key); },
     clearBuffer () { this.buffered.clear(); },
 
     pressDirection (forceDiagonal = false) {
@@ -139,13 +139,13 @@ var keyInt = {
             }
         } else {
             if (dirPress == 0) {
-                this.buffer.delete(KEY.UP);
+                this.buffered.delete(KEY.UP);
             } else if (dirPress == 1) {
-                this.buffer.delete(KEY.LEFT);
+                this.buffered.delete(KEY.LEFT);
             } else if (dirPress == 2) {
-                this.buffer.delete(KEY.DOWN);
+                this.buffered.delete(KEY.DOWN);
             } else if (dirPress == 3) {
-                this.buffer.delete(KEY.RIGHT);
+                this.buffered.delete(KEY.RIGHT);
             }
             this.dirCD = REPEAT_TIME;
             return new Vec2(...pressTbl[this.dirPress]);
