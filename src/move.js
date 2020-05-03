@@ -171,13 +171,13 @@ var moveInd = {
             }
             return;
         }
-        Drawer.color = MOVE_IND_COLOR[this.clr[ind]];
-        Drawer.drawCirc(false, x, y, 3, 0.5 * op);
+        drawer.color = MOVE_IND_COLOR[this.clr[ind]];
+        drawer.drawCirc(false, x, y, 3, 0.5 * op);
     },    
     
     drawAll(dt) {
         let i = this.length - 1;
-        Drawer.color = "#FFF";
+        drawer.color = "#FFF";
         for (; i >= 0; i -= 1) {
             this.advanceDraw(dt, i);
         }
