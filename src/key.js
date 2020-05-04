@@ -72,7 +72,7 @@ var keyInt = {
 
     getDirection (forceDiagonal = false) {
         const REPEAT_TIME = 192,
-            pressTbl = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+            PRESS_TBL = [[0, -1], [-1, 0], [0, 1], [1, 0]];
         let dirPress = -1, maxBuffer = 9999;
         if (this.isBuffered(KEY.UP, maxBuffer)) {
             if (forceDiagonal) {
@@ -148,7 +148,7 @@ var keyInt = {
                 this.buffered.delete(KEY.RIGHT);
             }
             this.dirCD = REPEAT_TIME;
-            return new Vec2(...pressTbl[this.dirPress]);
+            return new Vec2(PRESS_TBL[this.dirPress][0], PRESS_TBL[this.dirPress][1]);
         }
     }
 };
