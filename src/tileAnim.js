@@ -42,7 +42,7 @@ var tileAnim = {
     shrink (dt, ind, color)  {
         let shrink = this.time[ind] / 64;
         if (shrink >= 8) { return true; }
-        drawer.setLineWidth(3 / shrink).setColor(color);
+        drawer.setLineWidth(3 * (1 - shrink / 8)).setColor(color);
         drawer.drawRect(true, this.x[ind] + shrink, this.y[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink);
         return false;
@@ -50,7 +50,7 @@ var tileAnim = {
     shrinkFill (dt, ind, color)  {
         let shrink = this.time[ind] / 64;
         if (shrink >= 8) { return true; }
-        drawer.setLineWidth(3 / shrink).setColor(color);
+        drawer.setLineWidth(3 * (1 - shrink / 8)).setColor(color);
         drawer.drawRect(false, this.x[ind] + shrink, this.y[ind] + shrink,
             16 - 2 * shrink, 16 - 2 * shrink, 0.5);
         drawer.drawRect(true, this.x[ind] + shrink, this.y[ind] + shrink,
@@ -80,7 +80,7 @@ tileAnim.animate[TILE_ANIM.ORANGE] = function (dt, ind) {
     let op = 1 - (tileAnim.time[ind] / 512);
     drawer.lineWidth = 3;
     if (op <= 0) { return true; }
-    drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE]);
+    drawer.setLineWidth(3 * op).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE]);
     drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
@@ -102,7 +102,7 @@ tileAnim.animate[TILE_ANIM.ORANGE_RED] = function (dt, ind) {
     if (op <= 0) { return true; }
     drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_RED]);
     drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, 0.75);
-    drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_RED]);
+    drawer.setLineWidth(3 * op).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_RED]);
     drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
@@ -111,7 +111,7 @@ tileAnim.animate[TILE_ANIM.ORANGE_GREEN] = function (dt, ind) {
     if (op <= 0) { return true; }
     drawer.setLineWidth(5 * op + 3).setColor(TILE_COLOR.INNER_TBL[TILE.ORANGE_GREEN]);
     drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, 0.75);
-    drawer.setLineWidth(3).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_GREEN]);
+    drawer.setLineWidth(3 * op).setColor(TILE_COLOR.OUTER_TBL[TILE.ORANGE_GREEN]);
     drawer.drawRect(true, tileAnim.x[ind], tileAnim.y[ind], 16, 16, op);
     return false;
 };
