@@ -1,4 +1,3 @@
-
 var tile = {
     maxX: TILE_MAX_X, maxY: TILE_MAX_Y,
     max: TILE_MAX,
@@ -151,42 +150,36 @@ var tile = {
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
         
-        let scale = Math.abs(TILE_TRAVEL_TBL[type]);
+        let scale = Math.abs(TILE_PROP.TRAVEL_TBL[type]);
+        if (type <= TILE.NULL || type === TILE.WALL || type > TILE.WALL) {
+            return false;
+        }
+        this.setTile(TILE_PROP.CHANGE_TBL[type], posx, posy);
         // Nothing for type < 0 (no Tile)
         if (type === TILE.BLUE) {
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.BLUE, posx, posy);
+            tileAnim.create(TILE_ANIM.BLUE, posx, posy);
         } else if (type === TILE.RED) {
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.RED, posx, posy);
+            tileAnim.create(TILE_ANIM.RED, posx, posy);
         } else if (type === TILE.GREEN) {
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.GREEN, posx, posy);
+            tileAnim.create(TILE_ANIM.GREEN, posx, posy);
         }
         // Nothing for Purple tile (ends the level)
         else if (type === TILE.ORANGE) { // Takes 2 steps
-            this.setTile(TILE.BLUE, posx, posy);
-            tileAnimation.create(TILE_ANIM.ORANGE, posx, posy);
+            tileAnim.create(TILE_ANIM.ORANGE, posx, posy);
         } else if (type === TILE.STEEL) { // Never breaks
-            undo.addTileUpdate(TILE.STEEL, this.getIndex(posx, posy));
+            //undo.addTileUpdate(TILE.STEEL, this.getIndex(posx, posy));
         } else if (type === TILE.DOUBLE_BLUE) { // Goes diagonal
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.DOUBLE_BLUE, posx, posy);
+            tileAnim.create(TILE_ANIM.DOUBLE_BLUE, posx, posy);
         } else if (type === TILE.DOUBLE_RED) { // Goes diagonal
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.DOUBLE_RED, posx, posy);
+            tileAnim.create(TILE_ANIM.DOUBLE_RED, posx, posy);
         } else if (type === TILE.DOUBLE_ORANGE) { // Takes 3 steps
-            this.setTile(TILE.ORANGE, posx, posy);
-            tileAnimation.create(TILE_ANIM.DOUBLE_ORANGE, posx, posy);
+            tileAnim.create(TILE_ANIM.DOUBLE_ORANGE, posx, posy);
         } else if (type === TILE.ORANGE_RED) {
-            this.setTile(TILE.RED, posx, posy);
-            tileAnimation.create(TILE_ANIM.ORANGE_RED, posx, posy);
+            tileAnim.create(TILE_ANIM.ORANGE_RED, posx, posy);
         } else if (type === TILE.ORANGE_GREEN) {
-            this.setTile(TILE.GREEN, posx, posy);
-            tileAnimation.create(TILE_ANIM.ORANGE_GREEN, posx, posy);
+            tileAnim.create(TILE_ANIM.ORANGE_GREEN, posx, posy);
         } else if (type === TILE.YELLOW) {
-            this.setTile(TILE.NULL, posx, posy);
-            tileAnimation.create(TILE_ANIM.YELLOW, posx, posy);
+            tileAnim.create(TILE_ANIM.YELLOW, posx, posy);
             if (dir.x !== 0) {
                 player.to.tar.x = 16 * this.searchHorz(posx + dir.x * 16, posy, dir.x < 0) + 8;
             } else {
@@ -206,30 +199,11 @@ var tile = {
         player.lastStep = type;
         
         let direction = new Vec2(dir.x, dir.y), scale = Math.abs(TILE_TRAVEL_TBL[type]);
-        // Nothing for type < 0 (no Tile)
-        if (type === TILE.BLUE) {
-            this.setTile(TILE.NULL, posx, posy, true, true, true);
-        } else if (type === TILE.RED) {
-            this.setTile(TILE.NULL, posx, posy, true, true, true);
-        } else if (type === TILE.GREEN) {
-            this.setTile(TILE.NULL, posx, posy, true, true, true);
+        if (type <= TILE.NULL || type === TILE.WALL || type > TILE.WALL) {
+            return false;
         }
-        // Nothing for Purple tile (ends the level)
-        else if (type === TILE.ORANGE) {
-            this.setTile(TILE.BLUE, posx, posy, true, true, true);
-        } else if (type === TILE.STEEL) {
-            undo.addScoutUpdate(TILE.STEEL, this.getIndex(posx, posy));
-        } else if (type === TILE.DOUBLE_BLUE) { // Goes diagonal
-            this.setTile(TILE.NULL, posx, posy, true, true, true);
-        } else if (type === TILE.DOUBLE_RED) { // Goes diagonal
-            this.setTile(TILE.NULL, posx, posy, true, true, true);
-        } else if (type === TILE.DOUBLE_ORANGE) { // Takes 3 steps
-            this.setTile(TILE.ORANGE, posx, posy, true, true, true);
-        } else if (type === TILE.ORANGE_RED) {
-            this.setTile(TILE.RED, posx, posy, true, true, true);
-        } else if (type === TILE.ORANGE_GREEN) {
-            this.setTile(TILE.GREEN, posx, posy, true, true, true);
-        } else if (type === TILE.YELLOW) {
+        this.setTile(TILE_PROP.CHANGE_TBL[type], posx, posy, true, true, true);
+        if (type === TILE.YELLOW) {
             this.setTile(TILE.NULL, posx, posy, true, true, true);
             // "onOver" is unneeded here
             if (dir.x !== 0) {
@@ -261,19 +235,19 @@ var tile = {
             return 0;
         } else if (type === TILE.ICE_BLUE) {
             this.onStep(TILE.BLUE, dir);
-            tileAnimation.create(TILE_ANIM.ICE, posx, posy);
+            tileAnim.create(TILE_ANIM.ICE, posx, posy);
             return this.onLand(this.getTile(player.to.tar.x, player.to.tar.y), dir);
         } else if (type === TILE.ICE) {
             this.onStep(player.lastStep, dir);
-            tileAnimation.create(TILE_ANIM.ICE, posx, posy);
+            tileAnim.create(TILE_ANIM.ICE, posx, posy);
             return this.onLand(this.getTile(player.to.tar.x, player.to.tar.y), dir);
         } else if (type === TILE.ICE_RED) {
             this.onStep(TILE.RED, dir);
-            tileAnimation.create(TILE_ANIM.ICE, posx, posy);
+            tileAnim.create(TILE_ANIM.ICE, posx, posy);
             return this.onLand(this.getTile(player.to.tar.x, player.to.tar.y), dir);
         } else if (type === TILE.ICE_GREEN) {
             this.onStep(TILE.GREEN, dir);
-            tileAnimation.create(TILE_ANIM.ICE, posx, posy);
+            tileAnim.create(TILE_ANIM.ICE, posx, posy);
             return this.onLand(this.getTile(player.to.tar.x, player.to.tar.y), dir);
         }
         return TILE_TRAVEL_TBL[type];
