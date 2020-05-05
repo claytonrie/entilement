@@ -30,6 +30,14 @@ var tileAnim = {
         }
         return true;
     },
+    drawAll(dt) {
+        let i = this.length - 1;
+        if (i >= 0) {
+            for (; i >= 0; i -= 1) {
+                this.advanceDraw(dt, i);
+            }
+        }
+    },
 
     shrink (dt, ind, color)  {
         let shrink = this.time[ind] / 64;
