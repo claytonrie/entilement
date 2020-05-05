@@ -198,7 +198,7 @@ var tile = {
         posx -= posx % 16; posy -= posy % 16;
         player.lastStep = type;
         
-        let direction = new Vec2(dir.x, dir.y), scale = Math.abs(TILE_TRAVEL_TBL[type]);
+        let direction = new Vec2(dir.x, dir.y), scale = Math.abs(TILE_PROP.TRAVEL_TBL[type]);
         if (type <= TILE.NULL || type === TILE.WALL || type > TILE.WALL) {
             return false;
         }
