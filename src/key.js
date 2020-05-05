@@ -148,7 +148,7 @@ var keyInt = {
                 this.buffered.delete(KEY.RIGHT);
             }
             this.dirCD = REPEAT_TIME;
-            return new Vec2(PRESS_TBL[this.dirPress][0], PRESS_TBL[this.dirPress][1]);
+            return new Vec2(PRESS_TBL[dirPress][0], PRESS_TBL[dirPress][1]);
         }
     }
 };
