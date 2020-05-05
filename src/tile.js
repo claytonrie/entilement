@@ -244,7 +244,7 @@ var tile = {
             tileAnim.create(TILE_ANIM.ICE, posx, posy);
             return this.onLand(this.getTile(player.to.tar.x, player.to.tar.y), dir);
         }
-        return TILE_TRAVEL_TBL[type];
+        return TILE_PROP.TRAVEL_TBL[type];
     },
     
     // Return whether we landed on a valid space
