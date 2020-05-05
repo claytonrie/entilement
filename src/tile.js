@@ -136,12 +136,6 @@ var tile = {
                 this.draw(this.type[i], 16 * (i % this.maxX), 16 * ((i / this.maxX) | 0));
             }
         }
-        i = this.alength - 1;
-        if (i >= 0) {
-            for (; i >= 0; i -= 1) {
-                this.animation.advanceDraw(dt, i);
-            }
-        }
     },
 
     onStep(type, dir) {
