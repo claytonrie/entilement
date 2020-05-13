@@ -16,7 +16,16 @@ var level = {
         tileAnim.length = 0;
     },
 
-    load(num, setMode = true) {
+    setCurrent (val) {
+        if (val >= LEVEL.DATA.length) {
+            val %= LEVEL.DATA.length;
+        } else if (val < 0) {
+            val += LEVEL.DATA.length;
+        }
+        this.current = val;
+    },
+    
+    load(num = this.current, setMode = true) {
         if (setMode) {
             game.mode = GAME.CONSTRUCT;
             this.reset();
@@ -24,13 +33,20 @@ var level = {
         
         // Clear the data reserve buffer
         this.reserve = []; this.size = 0;
-        if (LEVEL.DATA.length >= num) {
+        if (num >= LEVEL.DATA.length) {
             num %= LEVEL.DATA.length;
         } else if (num < 0) {
             num += LEVEL.DATA.length;
         }
         this.decode(LEVEL.DATA[num]);
         this.current = num;
+    },
+    
+    factoryCreate  (data, chap = " ", clr = null) {
+        let ind = LEVEL.DATA.length;
+        LEVEL.DATA[ind] = data;
+        LEVEL.CHAPTER[ind] = chap;
+        LEVEL.COLOR[ind] = clr;
     },
     
     decode(str) {
