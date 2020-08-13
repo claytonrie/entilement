@@ -81,25 +81,21 @@ var text = {
             off = this.off[ind];
     	let group = this.group[ind],
         	phase = this.phase[ind];
-        let phase_len = -1;
+        let phase_len = TEXT_TIME[phase];
         let color = this.grColor[group],
         	stay_len = this.grStay[group];
-        let time = this.time[ind], perc;
+        let time = this.time[ind], 
+            perc = time / phase_len;
         
         drawer.ctx.font = `${size * drawer.scale}px monospace`;
     	if (phase === TEXT_PHASE.APPEAR) {
-        	phase_len = TEXT_PHASE_LEN.APPEAR;
             // Draw nothing, wait for letter to appear
         } else if (phase === TEXT_PHASE.SHIFT) {
-        	phase_len = TEXT_PHASE_LEN.SHIFT;
             // Fade in and lift up
-            perc = time / phase_len;
             drawer.color = "#FFF";
             drawer.drawText(true, char, x + off, y + size * (1 - perc), perc);
         } else if (phase === TEXT_PHASE.COMB) {
-        	phase_len = TEXT_PHASE_LEN.COMB;
-            perc = time / phase_len;
-            // 
+            // Miscolored text
             drawer.color = color;
             drawer.drawText(true, char, x, y, perc);
             drawer.color = "#888";
@@ -108,9 +104,7 @@ var text = {
             drawer.color = "#FFF";
             drawer.drawText(true, char, x + off * (1 - perc), y, 1 - perc);
         } else if (phase === TEXT_PHASE.RECOLOR) {
-        	phase_len = TEXT_PHASE_LEN.RECOLOR;
-            perc = time / phase_len;
-            // Real text
+            // Properly colored text
             drawer.color = "#DDD";
             drawer.drawText(true, char, x, y, perc);
             drawer.color = color;
@@ -127,8 +121,6 @@ var text = {
             drawer.color = color;
             drawer.drawText(false, char, x, y);
         } else if (phase === TEXT_PHASE.FADE) {
-        	phase_len = TEXT_PHASE_LEN.FADE;
-            perc = time / phase_len;
             drawer.color = "#DDD";
             drawer.drawText(true, char, x, y - size * perc,
                             1 - perc);
