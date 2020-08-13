@@ -73,9 +73,9 @@ var text = {
         return delay - 64 * txt.length;
     },
 
-	advanceDraw(dt, ind) {
+    advanceDraw(dt, ind) {
     	let x = this.x[ind],
-        	y = this.y[ind],
+            y = this.y[ind],
             char = this.char[ind],
             size = this.size[ind],
             off = this.off[ind];
@@ -87,7 +87,8 @@ var text = {
         let time = this.time[ind], 
             perc = time / phase_len;
         
-        drawer.ctx.font = `${size * drawer.scale}px monospace`;
+        drawer.font = size;
+        drawer.lineWidth = size / 40;
     	if (phase === TEXT_PHASE.APPEAR) {
             // Draw nothing, wait for letter to appear
         } else if (phase === TEXT_PHASE.SHIFT) {
