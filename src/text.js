@@ -4,7 +4,7 @@ var text = {
     char: new Array(TEXT_MAX),
     x: new Uint16Array(TEXT_MAX),
     y: new Uint16Array(TEXT_MAX),
-    off: new Uint8Array(TEXT_MAX),
+    off: new Int8Array(TEXT_MAX),
     size: new Uint8Array(TEXT_MAX),
     time: new Int16Array(TEXT_MAX),
     phase: new Uint8Array(TEXT_MAX),
