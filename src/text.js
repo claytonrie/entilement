@@ -42,7 +42,7 @@ var text = {
     
     create (txt, x, y, size, color, stay, group, delay = 0, off = (i => 0)) {
         let gr;
-        if (group < 255) {
+        if (group === 255) {
         	gr = this.grLength;
             this.grLength += 1;
         } else {
