@@ -11,6 +11,8 @@ var TO_TIME_DUR = 256;
 var UNDO_MAX = TILE_MAX,
     UNDO_SCOUT_MAX = Math.max(TILE_MAX_X, TILE_MAX_Y);
 
+var TEXT_MAX = 256;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Enumerated constants
 var GAME = {
@@ -20,6 +22,23 @@ var GAME = {
     CONSTRUCT: 3,
     PLAY:      4,
     RETRY:     5
+};
+
+let TEXT_PHASE = {
+    APPEAR: 0,
+    SHIFT: 1,
+    COMB: 2,
+    RECOLOR: 3,
+    STAY: 4,
+    FADE: 5,
+    DELETE: 6
+};
+
+let TEXT_GROUP = {
+	TITLE_1: 0,
+    TITLE_2: 1,
+    CHAPTER: 2,
+    HINT: 3
 };
 
 var TILE = {
@@ -98,9 +117,18 @@ var KEY = {
 };
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Tables
+var TEXT_TIME = [];
+
+TEXT_TIME[TEXT_PHASE.APPEAR] = 0;
+TEXT_TIME[TEXT_PHASE.SHIFT] = 512;
+TEXT_TIME[TEXT_PHASE.COMB] = 512;
+TEXT_TIME[TEXT_PHASE.RECOLOR] = 512;
+TEXT_TIME[TEXT_PHASE.STAY] = -1;
+TEXT_TIME[TEXT_PHASE.FADE] = TEXT_TIME[TEXT_PHASE.SHIFT];
+TEXT_TIME[TEXT_PHASE.DELETE] = -1;
+
 var TILE_COLOR = { OUTER_TBL: [], INNER_TBL: [] };
 
 TILE_COLOR.OUTER_TBL[TILE.GRAYED] = COLOR.DARK_GRAY;
