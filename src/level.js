@@ -25,7 +25,7 @@ var level = {
         this.current = val;
     },
     
-    load(num = this.current, setMode = true) {
+    load (num = this.current, setMode = true) {
         if (setMode) {
             game.mode = GAME.CONSTRUCT;
             this.reset();
@@ -42,14 +42,14 @@ var level = {
         this.current = num;
     },
     
-    factoryCreate  (data, chap = " ", clr = null) {
+    factoryCreate (data, chap = " ", clr = null) {
         let ind = LEVEL.DATA.length;
         LEVEL.DATA[ind] = data;
         LEVEL.CHAPTER[ind] = chap;
         LEVEL.COLOR[ind] = clr;
     },
     
-    decode(str) {
+    decode (str) {
         function stringToNum(bwte) {
             return LEVEL.CHAR_TABLE.indexOf(bwte);
         }
