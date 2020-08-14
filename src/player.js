@@ -88,6 +88,9 @@ var player = {
         left: SCOUT_CODE.VALID, right: SCOUT_CODE.VALID
     },
     scout: new Vec2(), // Scouting position
+    
+    purpleness: 0,
+    redness: 0,
 
     // Methods
     moveDirection (dir) {
@@ -138,19 +141,34 @@ var player = {
         return ret;
     },
     
-    die () { this.canMove = false; },
+    //die () { this.canMove = false; },
 
     draw () {
-        // draw a light circle at the destination
-        if (!this.to.atTarget) {
-            drawer.setLineWidth(1).setColor("#FFF");
-            drawer.drawCirc(true, this.to.tar, 7, 0.5);
+        if (game.mode === GAME.PASS && game.runTime < 512) {
+        	this.purpleness = game.runTime / 512;
+        } else if (this.purpleness > 0) {
+        	const DPURP = 1000 / game.FPS / 512;
+            if (this.purpleness <= DPURP) {
+            	this.purpleness = 0;
+            } else {
+            	this.purpleness -= DPURP;
+            }
         }
-        
-        // draw the player at their appearing position
-        drawer.color = "#FFF";
-        drawer.drawCirc(false, this.to.pos, 7, 0.333);
-        drawer.setLineWidth(3).setColor("yellow")
+        if (game.mode === GAME.RETRY && game.runTime < 512) {
+        	this.redness = game.runTime / 512;
+        } else if (this.redness > 0) {
+        	const DRED = 1000 / game.FPS / 512;
+            if (this.redness <= DRED) {
+            	this.redness = 0;
+            } else {
+            	this.redness -= DRED;
+            }
+        }
+        drawer.color = toColor(1 - this.purpleness / 3, 
+                               (1 - this.purpleness) * (1 - this.redness), 
+                               (1 - this.purpleness / 3) * (1 - this.redness));
+        drawer.drawCirc(false, this.to.pos, 7, 0.4);
+        drawer.setLineWidth(3);
         drawer.drawCirc(true, this.to.pos, 7);
     }
 };
