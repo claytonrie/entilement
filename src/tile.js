@@ -132,7 +132,7 @@ var tile = {
     drawAll(dt) {
         let i = this.max - 1;
         for (; i >= 0; i -= 1) {
-            if (this.type[i] > TILE.NULL) {
+            if (this.type[i] !== TILE.NULL) {
                 this.draw(this.type[i], 16 * (i % this.maxX), 16 * ((i / this.maxX) | 0));
             }
         }
@@ -285,7 +285,7 @@ var tile = {
         for (; i < scale; i += 1) {
             let type = this.getTile(player.scout.x + 16 * i * dir.x,
                     player.scout.y + 16 * i * dir.y);
-            if (type == TILE.WALL) { return false; }
+            if (type === TILE.WALL) { return false; }
         }
         return true;
     }
