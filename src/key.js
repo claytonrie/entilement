@@ -1,95 +1,157 @@
-// Key input set up
-var key = new (class {
-    constructor () {
-        this.pressed = [];
-        this.buffered = [];
-        this.cd = 0;
-        this.dirPress = null;
-    }
+// Key interface set up
+var keyInt = {
+    // Variables
+    pressed: new Map(),
+    buffered: new Map(),
+    dirCD: 0,
 
-    isPressed (...keys) {
-        let i = keys.length - 1;
-        for (; i >= 0; i -= 1) {
-            if (this.pressed.includes(keys[i])) {
-                return true;
+    // Functions
+    update(dt) {
+        const DISCARD_TIME = 2500;
+        let k, v;
+        // Update held time on pressed inputs
+        for ([k, v] of this.pressed) {
+            this.pressed.set(k, v + dt);
+        }
+        // Update buffered time
+        for ([k, v] of this.buffered) {
+            if (v + dt > DISCARD_TIME) {
+                this.buffered.delete(k);
+            } else {
+                this.buffered.set(k, v + dt);
             }
         }
-        return false;
-    }
-    isBuffered (...keys) {
-        let i = keys.length - 1;
-        for (; i >= 0; i -= 1) {
-            if (this.buffered.includes(keys[i])) {
-                return true;
+        // Update the cooldown on held directions
+        if (this.dirCD > 0) {
+            if (this.dirCD <= dt) {
+                this.dirCD = 0;
+            } else {
+                this.dirCD -= dt;
             }
         }
-        return false;
-    }
-    useBuffer (...keys) {
-        let i = keys.length - 1;
-        for (; i >= 0; i -= 1) {
-            if (this.buffered.includes(keys[i])) {
-                this.buffered.splice(this.buffered.indexOf(keys[i]), 1);
-            }
+    },
+    
+    pressKey(key) {
+        if (!this.pressed.has(key)) {
+            this.pressed.set(key, 0);
+            this.buffered.set(key, 0);
         }
-    }
-    clearBuffer () {
-        this.buffered = [];
-    }
+    },
+    
+    liftKey(key) {
+        this.pressed.delete(key);
+    },
+    
+    isPressed (key) { return this.pressed.has(key); },
+    isBuffered (key, maxBuffer = 9999) {
+        return this.buffered.has(key) && (this.buffered.get(key) < maxBuffer);
+    },
+    
+    useBuffer (key) { return this.buffered.delete(key); },
+    clearBuffer () { this.buffered.clear(); },
 
-    pressDirection () {
-        if (key.cd > 0) {
-            return false;
+    pressDirection (forceDiagonal = false) {
+        const BUFFER_TIME = 192;
+        // If we are on cooldown for holding a direction, only check for buffered inputs
+        if (this.dirCD > 0) {
+            if (forceDiagonal) {
+                return (this.isBuffered(KEY.UP, BUFFER_TIME) ^ this.isBuffered(KEY.DOWN, BUFFER_TIME)) &&
+                    (this.isBuffered(KEY.LEFT, BUFFER_TIME) ^ this.isBuffered(KEY.RIGHT, BUFFER_TIME));
+            }
+            return this.isBuffered(KEY.UP, BUFFER_TIME) || this.isBuffered(KEY.DOWN, BUFFER_TIME) ||
+                this.isBuffered(KEY.RIGHT, BUFFER_TIME) || this.isBuffered(KEY.LEFT, BUFFER_TIME);
         }
-        return this.isPressed("w", "a", "s", "d");
-    }
+        // Else, see if we are pressing a direction
+        if (forceDiagonal) {
+            return (this.isPressed(KEY.UP) ^ this.isPressed(KEY.DOWN)) &&
+                (this.isPressed(KEY.LEFT) ^ this.isPressed(KEY.RIGHT));
+        }
+        return this.isPressed(KEY.UP) || this.isPressed(KEY.DOWN) ||
+            this.isPressed(KEY.RIGHT) || this.isPressed(KEY.LEFT);
+    },
 
-    getDirection () {
-        const cooldown = 192,
-            pressTbl = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
-        if (this.isBuffered("w")) {
-            this.useBuffer("w");
-            this.dirPress = "w";
-        } else if (this.isBuffered("a")) {
-            this.useBuffer("a");
-            this.dirPress = "a";
-        } else if (this.isBuffered("s")) {
-            this.useBuffer("s");
-            this.dirPress = "s";
-        } else if (this.isBuffered("d")) {
-            this.useBuffer("d");
-            this.dirPress = "d";
+    getDirection (forceDiagonal = false) {
+        const REPEAT_TIME = 192,
+            PRESS_TBL = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+        let dirPress = -1, maxBuffer = 9999;
+        if (this.isBuffered(KEY.UP, maxBuffer)) {
+            if (forceDiagonal) {
+                if (this.isPressed(KEY.LEFT)) {
+                    maxBuffer = this.buffered.get(KEY.UP);
+                    dirPress = 0;
+                }
+            } else {
+                maxBuffer = this.buffered.get(KEY.UP);
+                dirPress = 0;
+            }
         }
-        if (!this.pressed.includes(this.dirPress)) {
-            let x = this.pressed.includes("d");
-            x += (x - 1) * this.pressed.includes("a");
-            if (x !== 0) {
-                key.cd = cooldown;
-                return new Vec2(x, 0);
+        if (this.isBuffered(KEY.LEFT, maxBuffer)) {
+            if (forceDiagonal) {
+                if (this.isPressed(KEY.DOWN)) {
+                    maxBuffer = this.buffered.get(KEY.LEFT);
+                    dirPress = 1;
+                }
+            } else {
+                maxBuffer = this.buffered.get(KEY.LEFT);
+                dirPress = 1;
             }
-            let y = this.pressed.includes("s");
-            y += (y - 1) * this.pressed.includes("w");
-            if (y !== 0) {
-                key.cd = cooldown;
+        }
+        if (this.isBuffered(KEY.DOWN, maxBuffer)) {
+            if (forceDiagonal) {
+                if (this.isPressed(KEY.RIGHT)) {
+                    maxBuffer = this.buffered.get(KEY.DOWN);
+                    dirPress = 2;
+                }
+            } else {
+                maxBuffer = this.buffered.get(KEY.DOWN);
+                dirPress = 2;
             }
-            return new Vec2(0, y);
+        }
+        if (this.isBuffered(KEY.RIGHT, maxBuffer)) {
+            if (forceDiagonal) {
+                if (this.isPressed(KEY.UP)) {
+                    maxBuffer = this.buffered.get(KEY.RIGHT);
+                    dirPress = 3;
+                }
+            } else {
+                maxBuffer = this.buffered.get(KEY.RIGHT);
+                dirPress = 3;
+            }
+        }
+        if (dirPress < 0) {
+            if (this.pressed.has(KEY.RIGHT)) {
+                if (!this.pressed.has(KEY.LEFT)) {
+                    this.dirCD = REPEAT_TIME;
+                    return new Vec2(1, 0);
+                }
+            } else if (this.pressed.has(KEY.LEFT)) {
+                this.dirCD = REPEAT_TIME;
+                return new Vec2(-1, 0);
+            }
+            if (this.pressed.has(KEY.DOWN)) {
+                if (!this.pressed.has(KEY.UP)) {
+                    this.dirCD = REPEAT_TIME;
+                    return new Vec2(0, 1);
+                }
+            } else if (this.pressed.has(KEY.UP)) {
+                this.dirCD = REPEAT_TIME;
+                return new Vec2(0, -1);
+            }
         } else {
-            key.cd = cooldown;
-            return new Vec2(...pressTbl[this.dirPress]);
-        }
-    }
-})();
-onkeydown = e => {
-    if (!key.pressed.includes(e.key.toLowerCase())) {
-        key.pressed.push(e.key.toLowerCase());
-        if (!key.buffered.includes(e.key.toLowerCase())) {
-            key.buffered.push(e.key.toLowerCase());
-            key.cd = 0;
+            if (dirPress == 0) {
+                this.buffered.delete(KEY.UP);
+            } else if (dirPress == 1) {
+                this.buffered.delete(KEY.LEFT);
+            } else if (dirPress == 2) {
+                this.buffered.delete(KEY.DOWN);
+            } else if (dirPress == 3) {
+                this.buffered.delete(KEY.RIGHT);
+            }
+            this.dirCD = REPEAT_TIME;
+            return new Vec2(PRESS_TBL[dirPress][0], PRESS_TBL[dirPress][1]);
         }
     }
 };
-onkeyup = e => {
-    if (key.pressed.includes(e.key.toLowerCase())) {
-        key.pressed.splice(key.pressed.indexOf(e.key.toLowerCase()), 1);
-    }
-};
+
+onkeydown = e => keyInt.pressKey(e.key.toLowerCase());
+onkeyup = e => keyInt.liftKey(e.key.toLowerCase());
